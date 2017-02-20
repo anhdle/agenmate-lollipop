@@ -1,0 +1,25 @@
+<vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:height="@dimen/heart_size"
+    android:width="@dimen/heart_size"
+    android:viewportHeight="24"
+    android:viewportWidth="24" >
+  <path
+      android:name="balloon_frame"
+      android:fillAlpha="0"
+      android:strokeColor="@android:color/black"
+      android:strokeAlpha="0.0"
+      android:fillColor="@android:color/white"
+      android:pathData="M13.7,24c-0.3,0 -0.6,-0.1 -0.8,-0.1c-0.3,-0.1 -0.6,-0.1 -0.8,-0.1s-0.6,0.1 -0.8,0.1c-0.3,0.1 -0.6,0.1 -0.8,0.1c-0.2,0 -1.4,-0.1 -1.4,-1.5c0,0 0,0 0,0C3.7,21.2 0,16.7 0,11.4C0,5.1 5.4,0 12,0s12,5.1 12,11.4c0,5.2 -3.7,9.7 -8.9,11.1c0,0 0,0 0,0c0,0.4 -0.1,0.7 -0.3,1C14.6,23.7 14.3,24 13.7,24C13.7,24 13.7,24 13.7,24z"/>
+  <group
+      android:name="balloon_group"
+      android:pivotX="12"
+      android:pivotY="12"
+      android:scaleX="0.0"
+      android:scaleY="0.0">
+    <path
+        android:name="balloon_color"
+        android:fillColor="@color/md_red_700"
+        android:pathData="M23.1,11.4c0,-5.9 -4.9,-10.6 -11.1,-10.6C5.9,0.8 0.9,5.6 0.9,11.4c0,5.2 3.9,9.5 9,10.4c-0.1,0.2 -0.1,0.4 -0.1,0.7c0,1.1 1,0.4 2.1,0.4c1.2,0 2.1,0.8 2.1,-0.4c0,-0.2 0,-0.5 -0.1,-0.7C19.2,21 23.1,16.6 23.1,11.4z"/>
+  </group>
+</vector>

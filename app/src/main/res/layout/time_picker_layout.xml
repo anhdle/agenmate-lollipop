@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <!--<View
+        android:background="@color/md_grey_50"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/container_hour"
+        app:layout_constraintTop_toTopOf="@+id/container_hour"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin" />-->
+
+    <!-- Hour -->
+    <FrameLayout
+        android:id="@+id/container_hour"
+        android:layout_width="@dimen/hour_circle_size"
+        android:layout_height="@dimen/hour_circle_size"
+        android:layout_gravity="center"
+        app:layout_constraintLeft_toLeftOf="@+id/arc_menu_time"
+        app:layout_constraintBottom_toTopOf="@+id/container_am_pm"
+        app:layout_constraintVertical_bias="0.25">
+
+        <com.agenmate.lollipop.ui.layout.timepicker.SeekArc
+            android:id="@+id/seekArcHour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="8dp"
+            app:progressWidth="4dp"
+            app:arcColor="@android:color/white"
+            app:progressColor="@color/md_red_700"
+            />
+
+        <TextView
+            android:id="@+id/seekArcProgressHour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="36sp" />
+    </FrameLayout>
+
+
+
+    <!-- Minute -->
+    <FrameLayout
+        android:id="@+id/container_minute"
+        android:layout_width="@dimen/minute_circle_size"
+        android:layout_height="@dimen/minute_circle_size"
+        android:layout_gravity="center"
+        app:layout_constraintRight_toRightOf="@+id/container_am_pm"
+        app:layout_constraintLeft_toRightOf="@+id/container_hour"
+        app:layout_constraintBottom_toTopOf="@+id/container_am_pm"
+
+        >
+
+        <com.agenmate.lollipop.ui.layout.timepicker.SeekArc
+            android:id="@+id/seekArcMinute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="6dp"
+            app:progressWidth="4dp"
+            app:arcColor="@android:color/white"
+            app:progressColor="@color/md_green_700"
+            />
+
+        <TextView
+            android:id="@+id/seekArcProgressMinute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="0"
+            android:textSize="32sp" />
+    </FrameLayout>
+
+    <!--AMPM-->
+    <FrameLayout
+        app:layout_constraintLeft_toRightOf="@id/container_hour"
+        app:layout_constraintTop_toTopOf="@+id/arc_menu_time"
+        app:layout_constraintBottom_toBottomOf="@id/arc_menu_time"
+        app:layout_constraintVertical_bias="0.5"
+        android:id="@+id/container_am_pm"
+        android:layout_width="@dimen/ampm_circle_width"
+        android:layout_height="@dimen/ampm_circle_height"
+        android:layout_gravity="center">
+
+        <com.agenmate.lollipop.ui.layout.timepicker.FlippingArc
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:id="@+id/seekArcAMPM"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:padding="4dp"
+            app:rotation="270"
+            app:progressWidth="3dp"
+            app:max="10"
+            app:arcColor="@android:color/white"
+            app:progressColor="@color/md_blue_700"
+            />
+
+        <ImageButton
+            android:visibility="gone"
+            android:id="@+id/date_picker_year_prev"
+            android:alpha=".9"
+            android:elevation="2dp"
+            android:background="@drawable/round_button"
+            android:layout_gravity="center_vertical|start"
+            android:layout_marginLeft="2dp"
+            android:layout_marginStart="2dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+        <ImageButton
+            android:visibility="gone"
+            android:id="@+id/date_picker_year_next"
+            android:alpha=".9"
+            android:elevation="2dp"
+            android:background="@drawable/round_button"
+            android:layout_gravity="center_vertical|end"
+            android:layout_marginRight="2dp"
+            android:layout_marginEnd="2dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp" />
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/seekArcProgressAMPMTop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="AM"
+                android:textSize="20sp" />
+
+            <TextView
+                android:id="@+id/seekArcProgressAMPMBottom"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="PM"
+                android:alpha=".5"
+                android:textSize="20sp" />
+
+        </LinearLayout>
+    </FrameLayout>
+
+    <com.agenmate.lollipop.ui.layout.ArcMenu
+        android:layout_marginBottom="60dp"
+        app:layout_constraintHorizontal_bias="0.4"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:id="@+id/arc_menu_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:fromDegrees="210"
+        app:toDegrees="60"
+        app:childSize="40dp"/>
+</android.support.constraint.ConstraintLayout>

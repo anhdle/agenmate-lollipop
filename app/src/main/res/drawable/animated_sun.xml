@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_sun">
+    <target
+        android:animation="@animator/fill"
+        android:name="sun" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight0" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight1" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight2" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight3" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight4" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight5" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight6" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight7" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight8" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight9" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight10" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight11" />
+    <target
+        android:animation="@animator/colour"
+        android:name="sunlight12" />
+</animated-vector>

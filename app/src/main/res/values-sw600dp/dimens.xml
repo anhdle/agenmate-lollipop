@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="hour_circle_size">160dp</dimen>
+    <dimen name="minute_circle_size">140dp</dimen>
+    <dimen name="ampm_circle_height">140dp</dimen>
+    <dimen name="ampm_circle_width">160dp</dimen>
+    <dimen name="minute_circle_margin_top">140dp</dimen>
+    <dimen name="ampm_circle_margin_top">10dp</dimen>
+</resources>
