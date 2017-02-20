@@ -1,14 +1,11 @@
 package com.agenmate.lollipop.ui;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -27,7 +24,6 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
     private int                     mToProgress;
     private String[]                mItems                          = new String[0];
     private int                     mProgressDrawableId;
-    private int                     mThumbDrawableId;
     private int                     mIndicatorDrawableId;
     private int                     mProgressColor;
     private int                     mIndicatorColor;
@@ -39,10 +35,8 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
     private float                   mIndicatorSize;
     private float                   mDensity;
     private Drawable                mProgressDrawable;
-    private Drawable                mThumbDrawable;
+    private Drawable yellowBalloon, orangeBalloon, redBalloon;
     private OnItemSelectionListener mOnItemSelectionListener;
-    private Drawable blueBalloon, yellowBalloon;
-
 
     public SnappingSeekBar(final Context context) {
         super(context);
@@ -58,7 +52,6 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     private void initDefaultValues() {
         mProgressDrawableId = R.drawable.progress_bar;
-        mThumbDrawableId = R.drawable.balloon_thumb;
         mIndicatorDrawableId = R.drawable.circle_background;
         mProgressColor = Color.WHITE;
         mIndicatorColor = Color.WHITE;
@@ -93,7 +86,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     private void initDrawables() {
         mProgressDrawableId = R.drawable.progress_bar;
-        mThumbDrawableId = R.drawable.balloon_thumb;
+
         mIndicatorDrawableId = R.drawable.circle_background;
     }
 
@@ -150,24 +143,21 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     private void setDrawablesToSeekBar() {
         mProgressDrawable = ContextCompat.getDrawable(getContext(), mProgressDrawableId);
-        mThumbDrawable = ContextCompat.getDrawable(getContext(), mThumbDrawableId);
-        blueBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_blue);
-        yellowBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_yellow);
+        redBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_thumb_red);
+        yellowBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_thumb_yellow);
+        orangeBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_thumb_orange);
         ViewUtils.setColor(mProgressDrawable, mProgressColor);
-        ViewUtils.setColor(mThumbDrawable, mThumbnailColor);
+        ViewUtils.setColor(redBalloon, mThumbnailColor);
         mSeekBar.setProgressDrawable(mProgressDrawable);
-        mSeekBar.setThumb(mThumbDrawable);
-        final int thumbnailWidth = mThumbDrawable.getIntrinsicWidth();
+        mSeekBar.setThumb(redBalloon);
+        final int thumbnailWidth = redBalloon.getIntrinsicWidth();
         mSeekBar.setPadding(thumbnailWidth / 2, 0, thumbnailWidth / 2, 0);
     }
 
     private void initIndicators() {
-        ViewUtils.waitForLayoutPrepared(mSeekBar, new ViewUtils.LayoutPreparedListener() {
-            @Override
-            public void onLayoutPrepared(final View preparedView) {
-                final int seekBarWidth = preparedView.getWidth();
-                initIndicators(seekBarWidth);
-            }
+        ViewUtils.waitForLayoutPrepared(mSeekBar, preparedView -> {
+            final int seekBarWidth = preparedView.getWidth();
+            initIndicators(seekBarWidth);
         });
     }
 
@@ -179,7 +169,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
     }
 
     private void addCircleIndicator(final int seekBarWidth, final int index) {
-        final int thumbnailWidth = mThumbDrawable.getIntrinsicWidth();
+        final int thumbnailWidth = redBalloon.getIntrinsicWidth();
         final int sectionFactor = 100 / (mItemsAmount - 1);
         final float seekBarWidthWithoutThumbOffset = seekBarWidth - thumbnailWidth;
         final LayoutParams indicatorParams = new LayoutParams((int) mIndicatorSize, (int) mIndicatorSize);
@@ -187,7 +177,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
         indicator.setBackgroundResource(mIndicatorDrawableId);
         ViewUtils.setColor(indicator.getBackground(), mIndicatorColor);
         indicatorParams.leftMargin = (int) (seekBarWidthWithoutThumbOffset / 100 * index * sectionFactor + thumbnailWidth / 2 - mIndicatorSize / 2);
-        indicatorParams.topMargin = mThumbDrawable.getIntrinsicHeight() / 2 - (int) (mIndicatorSize / 2);
+        indicatorParams.topMargin = redBalloon.getIntrinsicHeight() / 2 - (int) (mIndicatorSize / 2);
         addView(indicator, indicatorParams);
     }
 
@@ -198,7 +188,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
     }
 
     private void addTextIndicator(final int completeSeekBarWidth, final int index) {
-        final int thumbnailWidth = mThumbDrawable.getIntrinsicWidth();
+        final int thumbnailWidth = redBalloon.getIntrinsicWidth();
         final int sectionFactor = 100 / (mItemsAmount - 1);
         final float seekBarWidthWithoutThumbOffset = completeSeekBarWidth - thumbnailWidth;
         final LayoutParams textParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -234,21 +224,24 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
     @Override
     public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
         mToProgress = progress;
-        if(progress == 0){
-            mSeekBar.setThumb(blueBalloon);
-            ViewUtils.setColor(mProgressDrawable, Color.BLUE);
-        }
-        else if(progress == 50){
-            mSeekBar.setThumb(yellowBalloon);
-            ViewUtils.setColor(mProgressDrawable, Color.YELLOW);
-        }
-        else if(progress == 100){
-            mSeekBar.setThumb(mThumbDrawable);
-            ViewUtils.setColor(mProgressDrawable, Color.RED);
-        }
-        Log.v("progress", String.valueOf(progress));
+        updateColor(progress);
         initThumbPosition(progress, fromUser);
         handleSetFromProgress(progress);
+    }
+
+    private void updateColor(int progress){
+        if(progress == 0){
+            mSeekBar.setThumb(yellowBalloon);
+            ViewUtils.setColor(mProgressDrawable, ContextCompat.getColor(getContext(), R.color.md_yellow_700));
+        }
+        else if(progress == 50){
+            mSeekBar.setThumb(orangeBalloon);
+            ViewUtils.setColor(mProgressDrawable, ContextCompat.getColor(getContext(), R.color.md_orange_700));
+        }
+        else if(progress == 100){
+            mSeekBar.setThumb(redBalloon);
+            ViewUtils.setColor(mProgressDrawable, ContextCompat.getColor(getContext(), R.color.md_red_700));
+        }
     }
 
     private void initThumbPosition(final int progress, final boolean fromUser) {
@@ -307,7 +300,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
     }
 
     public Drawable getThumb() {
-        return mThumbDrawable;
+        return redBalloon;
     }
 
     public int getProgress() {
@@ -316,6 +309,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     public void setProgress(final int progress) {
         mToProgress = progress;
+        updateColor(progress);
         handleSnapToClosestValue();
     }
 
@@ -345,10 +339,6 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     public void setProgressDrawable(final int progressDrawableId) {
         mProgressDrawableId = progressDrawableId;
-    }
-
-    public void setThumbDrawable(final int thumbDrawableId) {
-        mThumbDrawableId = thumbDrawableId;
     }
 
     public void setIndicatorDrawable(final int indicatorDrawableId) {

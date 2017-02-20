@@ -6,4 +6,6 @@
     <dimen name="ampm_circle_width">200dp</dimen>
     <dimen name="minute_circle_margin_top">120dp</dimen>
     <dimen name="ampm_circle_margin_top">8dp</dimen>
+    <dimen name="edit_fragment_vertical_margin">4dp</dimen>
+    <dimen name="text_size">16dp</dimen>
 </resources>

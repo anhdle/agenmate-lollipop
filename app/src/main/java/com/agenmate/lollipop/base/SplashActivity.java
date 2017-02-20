@@ -1,16 +1,17 @@
 package com.agenmate.lollipop.base;
 
 import android.content.Intent;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.list.ListActivity;
+import com.agenmate.lollipop.util.FontUtils;
 import com.squareup.seismic.ShakeDetector;
 
 import java.util.List;
@@ -34,24 +35,24 @@ public class SplashActivity extends BaseActivity implements ShakeDetector.Listen
         view.startAnimation(alphaAnimation);
     };
 
+    @BindViews({ R.id.slogan, R.id.card_bottom_right, R.id.card_top_right, R.id.card_top_left, R.id.logo}) List<View> animViews;
+
     @BindView(R.id.logo) ImageView logo;
     @BindView(R.id.card_top_left) View card1;
     @BindView(R.id.card_top_right) View card2;
     @BindView(R.id.card_bottom_right) View card3;
-    @BindViews({ R.id.slogan, R.id.card_bottom_right, R.id.card_top_right, R.id.card_top_left, R.id.logo}) List<View> animViews;
-
+    @BindView(R.id.slogan) TextView slogan;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
 
-      //  ((AppController) getApplication()).getComponent().inject(this);
+        slogan.setTypeface(FontUtils.get(this, "Dudu"));
 
-        SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-
+        /*SensorManager sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         ShakeDetector sd = new ShakeDetector(this);
-        sd.start(sensorManager);
+        sd.start(sensorManager);*/
 
         new Handler().postDelayed(() -> {
             ButterKnife.apply(animViews, ALPHA_FADE);
@@ -60,9 +61,6 @@ public class SplashActivity extends BaseActivity implements ShakeDetector.Listen
                 startActivity(intent);
             }, 3000);
         }, 300);
-
-
-
     }
 
     @Override

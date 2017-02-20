@@ -17,6 +17,7 @@
 package com.agenmate.lollipop.list;
 
 
+import android.content.Intent;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -40,10 +41,12 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.agenmate.lollipop.R;
+import com.agenmate.lollipop.addedit.AddEditActivity;
 import com.agenmate.lollipop.app.AppController;
 import com.agenmate.lollipop.base.BaseActivity;
 import com.agenmate.lollipop.ui.layout.SheetLayout;
 import com.agenmate.lollipop.util.EspressoIdlingResource;
+import com.agenmate.lollipop.util.MarkupUtils;
 
 import javax.inject.Inject;
 
@@ -79,20 +82,30 @@ public class ListActivity extends BaseActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
-        appBar.setVisibility(View.INVISIBLE);
-        drawerArrowDrawable = new DrawerArrowDrawable(this);
-        final ActionBar ab = getSupportActionBar();
-        // ab.setDisplayHomeAsUpEnabled(true);
 
-        drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open,  R.string.drawer_close);
-        mDrawerLayout.addDrawerListener(drawerToggle);
-        drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(false); // disable the button
+        actionBar.setDisplayHomeAsUpEnabled(false); // remove the left caret
+        actionBar.setDisplayShowHomeEnabled(false); // remove the icon
+
+        tabLayout.setVisibility(View.GONE);
+
+        actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + "'#ffffff'" +">AgenMate</font>"));
+
+
+        // TODO finish drawerlayout menu later for remote and profile
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // temp
+        //drawerArrowDrawable = new DrawerArrowDrawable(this);
+        // drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open,  R.string.drawer_close);
+        //mDrawerLayout.addDrawerListener(drawerToggle);
+        //drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
 
         sheetLayout.setFab(fab);
         sheetLayout.setFabAnimationEndListener(new SheetLayout.OnFabAnimationEndListener() {
             @Override
             public void onFabAnimationEnd() {
-
+                Intent intent = new Intent(getBaseContext(), AddEditActivity.class);
+                startActivity(intent);
             }
         });
         fab.setVisibility(View.INVISIBLE);

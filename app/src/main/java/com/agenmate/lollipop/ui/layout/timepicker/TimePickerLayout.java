@@ -317,6 +317,7 @@ public class TimePickerLayout extends ConstraintLayout {
     }
 
     public DateTime getTimeFromPicker(){
+        // TODO Fix Illegal instant due to time zone offset transition (daylight savings time 'gap'): 2017-03-12T02:53:00.000 (America/New_York)
         return new DateTime(year, month, dayOfMonth, convert12To24(), minute, 0,000);
     }
 

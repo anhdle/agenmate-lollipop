@@ -17,7 +17,9 @@
 package com.agenmate.lollipop.addedit;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
@@ -25,10 +27,8 @@ import android.support.design.widget.AppBarLayout;
 import android.support.test.espresso.IdlingResource;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+import android.view.MenuItem;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -118,13 +118,28 @@ public class AddEditActivity extends BaseActivity {
     }
 
     @SuppressLint("NewApi")
-    public void setTabColor(int color){
+    public void setBarColor(int color){
         appBar.setBackgroundColor(ContextCompat.getColor(this, colorBarIds[color]));
-        String htmlColor = color == 0 || color == 5 || color == 6 ? "'#ffffff'" : "'#000000'";
+        boolean setWhite = color == 0 || color == 5 || color == 6;
+        String htmlColor = setWhite ? "'#ffffff'" : "'#000000'";
         actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + htmlColor +">New TODO</font>"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.setStatusBarColor(ContextCompat.getColor(this, colorStatusIds[color]));
+            final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+            upArrow.setColorFilter(setWhite ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            getSupportActionBar().setHomeAsUpIndicator(upArrow);
         }
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

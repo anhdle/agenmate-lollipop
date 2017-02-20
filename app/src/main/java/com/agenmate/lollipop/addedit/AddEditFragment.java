@@ -18,7 +18,9 @@ package com.agenmate.lollipop.addedit;
 
 import android.app.Activity;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
@@ -32,8 +34,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.AlphaAnimation;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -44,14 +45,15 @@ import com.agenmate.lollipop.ui.layout.ArcMenu;
 import com.agenmate.lollipop.ui.layout.timepicker.TimePickerLayout;
 import com.agenmate.lollipop.util.FontUtils;
 import com.agenmate.lollipop.util.MarkupUtils;
+import com.agenmate.lollipop.util.ScreenUtils;
 
 import net.danlew.android.joda.DateUtils;
 
-import org.joda.time.DateTime;
-
 import java.util.Calendar;
+import java.util.List;
 
 import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -77,10 +79,31 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     private int selectedColor = -1;
     private Unbinder unbinder;
 
+    private static final ButterKnife.Action<View> ALPHA_FADE = (view, index) -> {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+        //alphaAnimation.setFillBefore(true);
+        alphaAnimation.setDuration(400);
+        alphaAnimation.setStartOffset(index * 200);
+        alphaAnimation.setFillAfter(true);
+        view.startAnimation(alphaAnimation);
+    };
+
+    private static final ButterKnife.Action<View> ALPHA_APPEAR = (view, index) -> {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+        //alphaAnimation.setFillBefore(true);
+        alphaAnimation.setDuration(400);
+        alphaAnimation.setStartOffset(index * 200);
+        alphaAnimation.setFillAfter(true);
+        view.startAnimation(alphaAnimation);
+    };
+
+    @BindViews({ R.id.title_text_view, R.id.title_card_view, R.id.desc_text_view, R.id.desc_card_view, R.id.priority_text_view, R.id.priority_card_view, R.id.color_text_view}) List<View> bottomViews;
+
     @BindView(R.id.arc_menu_color) ArcMenu arcMenu;
     @BindView(R.id.time_bottom_sheet) NestedScrollView sheet;
     @BindView(R.id.time_picker_layout) TimePickerLayout timePickerLayout;
-    @BindView(R.id.alarm_teller) TextView alarmTeller;
+    @BindView(R.id.due_date_text_view) TextView dueDateText;
+    @BindView(R.id.due_date_status) TextView dueDateStatus;
     @BindView(R.id.task_background) CoordinatorLayout background;
     @BindView(R.id.title_text_view) TextView titleText;
     @BindView(R.id.title_edit_text) EditText titleEdit;
@@ -134,36 +157,42 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
         colorButtons = new ImageButton[7];
         timePickerLayout.setColorArcMenu(colorButtons);
-        timePickerLayout.setOnTimePickerChangeListener(new TimePickerLayout.OnTimePickerChangeListener() {
-            @Override
-            public void onTimeChange(DateTime time) {
-                alarmTeller.setText("DATE: " + DateUtils.formatDateTime(getActivity(), time, DateUtils.FORMAT_SHOW_DATE
-                        | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_WEEKDAY));
-            }
-        });
+        // TODO hide time if not set alarm
+        timePickerLayout.setOnTimePickerChangeListener(time ->
+                dueDateStatus.setText(DateUtils.formatDateTime(getActivity(), time, DateUtils.FORMAT_SHOW_DATE
+                | DateUtils.FORMAT_SHOW_TIME | DateUtils.FORMAT_SHOW_WEEKDAY)));
 
         // TODO get color from db
         selectedColor = 0;
 
         background.setBackgroundResource(colorBackgroundIds[selectedColor]);
-        alarmTeller.setBackgroundResource(colorTabIds[selectedColor]);
-        ((AddEditActivity)getActivity()).setTabColor(selectedColor);
+        dueDateText.setBackgroundResource(colorTabIds[selectedColor]);
+
         formatText(titleText, "<b>T</b>itle");
         formatText(titleEdit, null);
         formatText(descText, "<b>D</b>escription");
         formatText(descEdit, null);
         formatText(colorText, "<b>C</b>olor <b>T</b>ag");
         formatText(priorityText, "<b>P</b>riority");
+        formatText(dueDateText, "<b>D</b>ue <b>D</b>ate:");
+        // TODO if db then set diff text for status
+        formatText(dueDateStatus, "(Scroll up to set)");
+        ((AddEditActivity)getActivity()).setBarColor(selectedColor);
+        if(selectedColor == 0 || selectedColor == 5 || selectedColor == 6){
+            dueDateStatus.setTextColor(Color.WHITE);
+            dueDateText.setTextColor(Color.WHITE);
+        }
+
 
         seekBar.setProgressDrawable(R.drawable.progress_bar);
-        seekBar.setThumbDrawable(R.drawable.balloon_thumb);
         seekBar.setItems(new String[]{"Low", "Medium", "High"});
-        seekBar.setProgressColor(Color.BLUE);
+        seekBar.setProgress(0);
+        //seekBar.setProgressColor(Color.BLUE);
         //seekBar.setThumbnailColor(resources.getColor(R.color.yellow_light));
         seekBar.setTextIndicatorColor(Color.BLACK);
-        seekBar.setIndicatorColor(ContextCompat.getColor(getActivity(), R.color.md_blue_grey_500));
+        seekBar.setIndicatorColor(ContextCompat.getColor(getActivity(), R.color.md_blue_grey_300));
         seekBar.setTextSize(14);
-        seekBar.setIndicatorSize(14);
+        seekBar.setIndicatorSize(4);
         /*ViewUtils.waitForLayoutPrepared(seekBar, new ViewUtils.LayoutPreparedListener() {
             @Override
             public void onLayoutPrepared(final View preparedView) {
@@ -243,6 +272,9 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
             final int index = i;
             final ImageButton button = new ImageButton(getActivity());
             button.setBackgroundResource(colorDrawables[i]);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                button.setElevation(ScreenUtils.dpToPx(getActivity(), 2));
+            }
             colorButtons[i] = button;
 
             arcMenu.addItem(button, v -> {
@@ -251,17 +283,20 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                     colorButtons[selectedColor].setAlpha(1f);
                     selectedColor = index;
                     background.setBackgroundResource(colorBackgroundIds[index]);
-                    alarmTeller.setBackgroundResource(colorTabIds[index]);
-                    ((AddEditActivity)getActivity()).setTabColor(selectedColor);
+                    dueDateText.setBackgroundResource(colorTabIds[index]);
+                    ((AddEditActivity)getActivity()).setBarColor(selectedColor);
+                    if(selectedColor == 0 || selectedColor == 5 || selectedColor == 6){
+                        dueDateStatus.setTextColor(Color.WHITE);
+                        dueDateText.setTextColor(Color.WHITE);
+                    } else {
+                        dueDateStatus.setTextColor(Color.BLACK);
+                        dueDateText.setTextColor(Color.BLACK);
+                    }
                 }
             });
         }
 
-
-
-
-        final Animation growAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.simple_grow);
-        final Animation shrinkAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.simple_shrink);
+        // TODO status change upon move up
         timeMenu = timePickerLayout.getDayArcMenu();
 
         BottomSheetBehavior
@@ -277,6 +312,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                         break;
 
                     case BottomSheetBehavior.STATE_COLLAPSED:
+                        ButterKnife.apply(bottomViews, ALPHA_APPEAR);
                         onColorArcExpanded();
 
                         if(timeMenu.isExpanded())timeMenu.switchState();
@@ -288,6 +324,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                         break;
 
                     case BottomSheetBehavior.STATE_EXPANDED:
+                        ButterKnife.apply(bottomViews, ALPHA_FADE);
                         for(int i = 0; i < 7; i++)
                             colorButtons[i].setAlpha(1f);
                         if(!timeMenu.isExpanded()) timePickerLayout.getDayArcMenu().switchState();
@@ -310,6 +347,10 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         });
         arcMenu.switchState();
 
+        new Handler().postDelayed(() -> {
+
+
+        }, 200);
         return rootView;
     }
 
