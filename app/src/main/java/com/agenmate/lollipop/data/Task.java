@@ -18,11 +18,23 @@ public final class Task {
     @NonNull
     private final String mId;
 
-    @Nullable
+    @NonNull
     private final String mTitle;
 
     @Nullable
     private final String mDescription;
+
+    @NonNull
+    private final int priority;
+
+    @NonNull
+    private final int color;
+
+    @NonNull
+    private final long dueAt;
+
+    @NonNull
+    private final boolean hasAlarm;
 
     private final boolean mCompleted;
 
@@ -32,8 +44,8 @@ public final class Task {
      * @param title       title of the task
      * @param description description of the task
      */
-    public Task(@Nullable String title, @Nullable String description) {
-        this(title, description, UUID.randomUUID().toString(), false);
+    public Task(@NonNull String title, @Nullable String description, @NonNull int priority, @NonNull int color, @NonNull long dueAt, @NonNull boolean hasAlarm) {
+        this(title, description, priority, color, dueAt, hasAlarm, UUID.randomUUID().toString(), false);
     }
 
     /**
@@ -44,8 +56,8 @@ public final class Task {
      * @param description description of the task
      * @param id          id of the task
      */
-    public Task(@Nullable String title, @Nullable String description, @NonNull String id) {
-        this(title, description, id, false);
+    public Task(@NonNull String title, @Nullable String description, @NonNull int priority, @NonNull int color, @NonNull long dueAt, @NonNull boolean hasAlarm, @NonNull String id) {
+        this(title, description, priority, color, dueAt, hasAlarm, id, false);
     }
 
     /**
@@ -55,8 +67,8 @@ public final class Task {
      * @param description description of the task
      * @param completed   true if the task is completed, false if it's active
      */
-    public Task(@Nullable String title, @Nullable String description, boolean completed) {
-        this(title, description, UUID.randomUUID().toString(), completed);
+    public Task(@NonNull String title, @Nullable String description, @NonNull int priority, @NonNull int color, @NonNull long dueAt, @NonNull boolean hasAlarm, boolean completed) {
+        this(title, description, priority, color, dueAt, hasAlarm, UUID.randomUUID().toString(), completed);
     }
 
     /**
@@ -68,11 +80,14 @@ public final class Task {
      * @param id          id of the task
      * @param completed   true if the task is completed, false if it's active
      */
-    public Task(@Nullable String title, @Nullable String description,
-                @NonNull String id, boolean completed) {
+    public Task(@Nullable String title, @Nullable String description, @NonNull int priority, @NonNull int color, @NonNull long dueAt, @NonNull boolean hasAlarm, @NonNull String id, boolean completed) {
         mId = id;
         mTitle = title;
         mDescription = description;
+        this.priority = priority;
+        this.color = color;
+        this.dueAt = dueAt;
+        this.hasAlarm = hasAlarm;
         mCompleted = completed;
     }
 
@@ -81,23 +96,24 @@ public final class Task {
         return mId;
     }
 
-    @Nullable
+    @NonNull
     public String getTitle() {
         return mTitle;
     }
 
     @Nullable
     public String getTitleForList() {
-        if (!Strings.isNullOrEmpty(mTitle)) {
-            return mTitle;
-        } else {
-            return mDescription;
-        }
+        return mTitle;
     }
 
     @Nullable
     public String getDescription() {
         return mDescription;
+    }
+
+    @NonNull
+    public int getPriority() {
+        return this.priority;
     }
 
     public boolean isCompleted() {
@@ -109,8 +125,7 @@ public final class Task {
     }
 
     public boolean isEmpty() {
-        return Strings.isNullOrEmpty(mTitle) &&
-                Strings.isNullOrEmpty(mDescription);
+        return Strings.isNullOrEmpty(mTitle);
     }
 
     @Override
@@ -131,5 +146,20 @@ public final class Task {
     @Override
     public String toString() {
         return "Task with title " + mTitle;
+    }
+
+    @NonNull
+    public int getColor() {
+        return color;
+    }
+
+    @NonNull
+    public long getDueAt() {
+        return dueAt;
+    }
+
+    @NonNull
+    public boolean hasAlarm() {
+        return hasAlarm;
     }
 }

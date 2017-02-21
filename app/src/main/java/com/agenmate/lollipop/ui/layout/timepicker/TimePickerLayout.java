@@ -6,7 +6,6 @@ import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -39,6 +38,11 @@ public class TimePickerLayout extends ConstraintLayout {
     private int previousDayOfWeek = -1;
     private int year, month, dayOfMonth, hour, minute, dayOfWeek;
     private boolean isAM;
+    private ImageButton[] colorButtons;
+    private Animation fadeAnimation;
+    public static final int NO_DUE_DATE = 0;
+    public static final int HAS_DUE_DATE = 1;
+    public static final int HAS_TIME = 2;
 
     private DateTime now;
     @BindView(R.id.container_hour) FrameLayout hourContainer;
@@ -51,16 +55,18 @@ public class TimePickerLayout extends ConstraintLayout {
     @BindView(R.id.seekArcProgressMinute) TextView minuteProgress;
     @BindView(R.id.seekArcProgressAMPMTop) TextView amProgress;
     @BindView(R.id.seekArcProgressAMPMBottom) TextView pmProgress;
-    @BindView(R.id.date_picker_year_next) ImageButton next;
-    @BindView(R.id.date_picker_year_prev) ImageButton prev;
+    @BindView(R.id.date_picker_year_next) Button next;
+    @BindView(R.id.date_picker_year_prev) Button prev;
     @BindView(R.id.arc_menu_time) ArcMenu dayArcMenu;
 
-    private ImageButton[] colorButtons;
+
 
     public TimePickerLayout(Context context) {
         super(context);
         init();
     }
+
+    private int dueDateStatus;
 
     public TimePickerLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -147,11 +153,13 @@ public class TimePickerLayout extends ConstraintLayout {
                     amProgress.setAlpha(1f);
                     pmProgress.setAlpha(.1f);
                     amPmArc.setProgress(0);
+                    listener.onTimeChange(getTimeFromPicker());
                 } else {
                     isAM = false;
                     amProgress.setAlpha(.1f);
                     pmProgress.setAlpha(1f);
                     amPmArc.setProgress(5);
+                    listener.onTimeChange(getTimeFromPicker());
                 }
             }
 
@@ -181,10 +189,11 @@ public class TimePickerLayout extends ConstraintLayout {
         for (int i = 0; i < 7; i++) {
             final int index = i;
             Button button = new Button(getContext());
-            button.setBackgroundResource(R.drawable.round_button);
+            button.setBackgroundResource(R.drawable.round_button_no_shadow);
             button.setText(daysOfWeek[i]);
             dayButtons[i] = button;
             dayArcMenu.addItem(button, null
+                    // TODO add extra actions
                     /*v -> {
                 v.setAlpha(1f);
                 colorButtons[index].setAlpha(1f);
@@ -192,7 +201,7 @@ public class TimePickerLayout extends ConstraintLayout {
 
                     dayButtons[previousDayOfWeek].setAlpha(0.2f);
                     previousDayOfWeek = index;
-                    // TODO
+
                    // setTime.set(Calendar.DAY_OF_WEEK, previousDayOfWeek + 1);
                 }
             }*/
@@ -204,35 +213,42 @@ public class TimePickerLayout extends ConstraintLayout {
                 int finalI = i;
                 if(isExpanded){
                     if(finalI != previousDayOfWeek)
-                        new Handler().postDelayed(() -> dayButtons[finalI].setAlpha(0.2f), 130 * finalI);
+                        new Handler().postDelayed(() -> dayButtons[finalI].setAlpha(0.2f), 100 * finalI);
                 } else dayButtons[finalI].setAlpha(1f);
             }
 
 
         });
 
-        dayArcMenu.setControlLayoutClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.v("arccontrol", "click");
-                setMode(mode == Mode.TIME ? Mode.DATE : Mode.TIME);
+        dayArcMenu.setControlLayoutClickListener(v -> {
+            if(mode == Mode.DATE){
+                if(dueDateStatus == HAS_DUE_DATE){
+                    dueDateStatus = HAS_TIME;
+                    resetTime();
+
+                } else { // TODO if already has time
+                    setUIMode(Mode.TIME);
+                }
+            } else {
+                setUIMode(Mode.DATE);
             }
         });
 
-        resetTime();
+        resetDate();
 
-        fadeAnimation = new AlphaAnimation(1f, 0.2f);
+        /*fadeAnimation = new AlphaAnimation(1f, 0.2f);
         fadeAnimation.setDuration(100);
         fadeAnimation.setInterpolator(new AccelerateInterpolator());
-        fadeAnimation.setFillAfter(true);
+        fadeAnimation.setFillAfter(true);*/
     }
 
     private Button [] dayButtons;
 
 
-    public void setMode(Mode mode){
+    public void setUIMode(Mode mode){
         this.mode = mode;
         if(mode == Mode.TIME){
+            dayArcMenu.setControlLayoutDrawable(R.drawable.ic_calendar);
             bigArc.setProgress(hour);
             setBigArcProgressText(hour);
 
@@ -249,6 +265,7 @@ public class TimePickerLayout extends ConstraintLayout {
             next.setVisibility(GONE);
             prev.setVisibility(GONE);
         } else {
+            dayArcMenu.setControlLayoutDrawable(R.drawable.ic_clock);
             bigArc.setProgress(month);
             setBigArcProgressText(month);
 
@@ -318,7 +335,7 @@ public class TimePickerLayout extends ConstraintLayout {
 
     public DateTime getTimeFromPicker(){
         // TODO Fix Illegal instant due to time zone offset transition (daylight savings time 'gap'): 2017-03-12T02:53:00.000 (America/New_York)
-        return new DateTime(year, month, dayOfMonth, convert12To24(), minute, 0,000);
+        return new DateTime(year, month, dayOfMonth, convert12To24(), minute, 0, 000);
     }
 
     public interface OnTimePickerChangeListener{
@@ -329,22 +346,30 @@ public class TimePickerLayout extends ConstraintLayout {
 
     public void setOnTimePickerChangeListener(OnTimePickerChangeListener listener){
         this.listener = listener;
+        listener.onTimeChange(getTimeFromPicker());
     }
 
-    public void resetTime(){
+    public void resetDate(){
         now = new DateTime();
         year = now.getYear();
         month = now.getMonthOfYear();
         dayOfMonth = now.getDayOfMonth();
-        hour = now.getHourOfDay();
-        isAM = hour < 13;
-        hour = isAM ? hour : hour - 12;
-        hour = hour == 0 ? 12 : hour;
-        minute = now.getMinuteOfHour(); // allow time
         dayOfWeek = now.getDayOfWeek() % 7;
         previousDayOfWeek = dayOfWeek;
 
-        setMode(Mode.DATE);
+        setUIMode(Mode.DATE);
+    }
+
+    public void resetTime(){
+        now = new DateTime();
+        hour = now.getHourOfDay();
+        isAM = hour < 12;
+        hour = isAM ? hour : hour - 12;
+        hour = hour == 0 ? 12 : hour;
+        minute = now.getMinuteOfHour(); // TODO allow time + 1
+
+        setUIMode(Mode.TIME);
+        listener.onTimeChange(getTimeFromPicker());
     }
 
     private int convert12To24(){
@@ -353,7 +378,17 @@ public class TimePickerLayout extends ConstraintLayout {
         hourIn24 = isAM ? hourIn24 : hourIn24 + 12;
         return hourIn24;
     }
-    
-    private Animation fadeAnimation;
+
+    public int getDueDateStatus(){
+        return dueDateStatus;
+    }
+
+    public void setDueDateStatus(int status){
+        this.dueDateStatus = status;
+    }
+
+    public void toggleAlarm(){
+        dueDateStatus = dueDateStatus == 1 ? 2 : 1;
+    }
 
 }

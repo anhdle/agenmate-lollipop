@@ -17,6 +17,8 @@
 package com.agenmate.lollipop.addedit;
 
 import android.annotation.SuppressLint;
+import android.app.SearchManager;
+import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -28,9 +30,14 @@ import android.support.test.espresso.IdlingResource;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.SearchView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.alarm.BaseAlarmController;
@@ -52,6 +59,7 @@ public class AddEditActivity extends BaseActivity {
 
     public static final int REQUEST_ADD_TASK = 1;
     private AddEditFragment addEditFragment;
+    private Menu menu;
 
     @Inject AddEditPresenter mAddEditTasksPresenter;
     @Inject BaseAlarmController alarmController;
@@ -117,10 +125,11 @@ public class AddEditActivity extends BaseActivity {
         return EspressoIdlingResource.getIdlingResource();
     }
 
+    private boolean setWhite;
     @SuppressLint("NewApi")
     public void setBarColor(int color){
         appBar.setBackgroundColor(ContextCompat.getColor(this, colorBarIds[color]));
-        boolean setWhite = color == 0 || color == 5 || color == 6;
+        setWhite = color == 0 || color == 5 || color == 6;
         String htmlColor = setWhite ? "'#ffffff'" : "'#000000'";
         actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + htmlColor +">New TODO</font>"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -129,17 +138,33 @@ public class AddEditActivity extends BaseActivity {
             upArrow.setColorFilter(setWhite ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
         }
-
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
+        Log.v("menunull", String.valueOf(menu));
+        if(menu != null){
+            for(int i = 0; i < menu.size(); i++){
+                Drawable drawable = menu.getItem(i).getIcon();
+                if(drawable != null) {
+                    drawable.mutate();
+                    drawable.setColorFilter(setWhite ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+                }
+            }
         }
 
-        return super.onOptionsItemSelected(item);
+
     }
+
+    private MenuItem alarmIcon;
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.add_edit_actions, menu);
+        this.menu = menu;
+        alarmIcon = menu.findItem(R.id.action_alarm);
+        alarmIcon.setVisible(true);
+        addEditFragment.onOptionsCreated();
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
 }

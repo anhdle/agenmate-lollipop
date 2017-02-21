@@ -44,6 +44,7 @@ import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.addedit.AddEditActivity;
 import com.agenmate.lollipop.app.AppController;
 import com.agenmate.lollipop.base.BaseActivity;
+import com.agenmate.lollipop.data.Task;
 import com.agenmate.lollipop.ui.layout.SheetLayout;
 import com.agenmate.lollipop.util.EspressoIdlingResource;
 import com.agenmate.lollipop.util.MarkupUtils;
@@ -52,6 +53,7 @@ import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
 
 public class ListActivity extends BaseActivity {
 
@@ -189,5 +191,11 @@ public class ListActivity extends BaseActivity {
         if (drawable != null && drawable instanceof Animatable) {
             ((Animatable) drawable).start();
         }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 }

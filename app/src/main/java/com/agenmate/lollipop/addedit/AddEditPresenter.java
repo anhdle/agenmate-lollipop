@@ -16,10 +16,8 @@
 
 package com.agenmate.lollipop.addedit;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.agenmate.lollipop.alarm.BaseAlarmController;
 import com.agenmate.lollipop.data.Task;
@@ -110,11 +108,11 @@ final class AddEditPresenter implements AddEditContract.Presenter {
 
 
     @Override
-    public void saveTask(String title, String description) {
+    public void saveTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
         if (isNewTask()) {
-            createTask(title, description);
+            createTask(title, description, priority, color, dueAt, hasAlarm);
         } else {
-            updateTask(title, description);
+            updateTask(title, description, priority, color, dueAt, hasAlarm);
         }
     }
 
@@ -155,8 +153,8 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         return mTaskId == null;
     }
 
-    private void createTask(String title, String description) {
-        Task newTask = new Task(title, description);
+    private void createTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
+        Task newTask = new Task(title, description, priority, color, dueAt, hasAlarm);
         if (newTask.isEmpty()) {
             mAddTaskView.showEmptyTaskError();
         } else {
@@ -165,11 +163,11 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         }
     }
 
-    private void updateTask(String title, String description) {
+    private void updateTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
         if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        mTasksRepository.saveTask(new Task(title, description, mTaskId));
+        mTasksRepository.saveTask(new Task(title, description, priority, color, dueAt, hasAlarm, mTaskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 

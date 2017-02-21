@@ -33,6 +33,10 @@ public final class TasksPersistenceContract {
         public static final String COLUMN_NAME_ENTRY_ID = "entryid";
         public static final String COLUMN_NAME_TITLE = "title";
         public static final String COLUMN_NAME_DESCRIPTION = "description";
+        public static final String COLUMN_NAME_PRIORITY = "priority";
+        public static final String COLUMN_NAME_COLOR = "color";
+        public static final String COLUMN_NAME_DUE_AT = "dueAt";
+        public static final String COLUMN_NAME_HAS_ALARM = "hasAlarm";
         public static final String COLUMN_NAME_COMPLETED = "completed";
     }
 }

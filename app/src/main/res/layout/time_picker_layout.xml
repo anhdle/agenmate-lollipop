@@ -21,8 +21,8 @@
     <!-- Hour -->
     <FrameLayout
         android:id="@+id/container_hour"
-        android:layout_width="@dimen/hour_circle_size"
-        android:layout_height="@dimen/hour_circle_size"
+        android:layout_width="152dp"
+        android:layout_height="152dp"
         android:layout_gravity="center"
         app:layout_constraintLeft_toLeftOf="@+id/arc_menu_time"
         app:layout_constraintBottom_toTopOf="@+id/container_am_pm"
@@ -52,8 +52,8 @@
     <!-- Minute -->
     <FrameLayout
         android:id="@+id/container_minute"
-        android:layout_width="@dimen/minute_circle_size"
-        android:layout_height="@dimen/minute_circle_size"
+        android:layout_width="132dp"
+        android:layout_height="132dp"
         android:layout_gravity="center"
         app:layout_constraintRight_toRightOf="@+id/container_am_pm"
         app:layout_constraintLeft_toRightOf="@+id/container_hour"
@@ -83,13 +83,12 @@
 
     <!--AMPM-->
     <FrameLayout
-        app:layout_constraintLeft_toRightOf="@id/container_hour"
+        app:layout_constraintLeft_toRightOf="@+id/container_hour"
         app:layout_constraintTop_toTopOf="@+id/arc_menu_time"
-        app:layout_constraintBottom_toBottomOf="@id/arc_menu_time"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintBottom_toBottomOf="@+id/arc_menu_time"
         android:id="@+id/container_am_pm"
-        android:layout_width="@dimen/ampm_circle_width"
-        android:layout_height="@dimen/ampm_circle_height"
+        android:layout_width="152dp"
+        android:layout_height="132dp"
         android:layout_gravity="center">
 
         <com.agenmate.lollipop.ui.layout.timepicker.FlippingArc
@@ -107,10 +106,10 @@
             app:progressColor="@color/md_blue_700"
             />
 
-        <ImageButton
+        <Button
+            android:text="-"
             android:visibility="gone"
             android:id="@+id/date_picker_year_prev"
-            android:alpha=".9"
             android:elevation="2dp"
             android:background="@drawable/round_button"
             android:layout_gravity="center_vertical|start"
@@ -119,10 +118,10 @@
             android:layout_width="40dp"
             android:layout_height="40dp" />
 
-        <ImageButton
+        <Button
+            android:text="+"
             android:visibility="gone"
             android:id="@+id/date_picker_year_next"
-            android:alpha=".9"
             android:elevation="2dp"
             android:background="@drawable/round_button"
             android:layout_gravity="center_vertical|end"

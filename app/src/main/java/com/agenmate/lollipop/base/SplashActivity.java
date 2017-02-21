@@ -59,6 +59,7 @@ public class SplashActivity extends BaseActivity implements ShakeDetector.Listen
             new Handler().postDelayed(() -> {
                 Intent intent = new Intent(getBaseContext(), ListActivity.class);
                 startActivity(intent);
+                finish();
             }, 3000);
         }, 300);
     }

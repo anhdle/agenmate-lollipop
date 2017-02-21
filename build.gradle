@@ -45,6 +45,6 @@ ext {
     rxandroidVersion = '1.2.1'
     sqlbriteVersion = '0.7.0'
     daggerVersion = '2.8'
-    butterknifeVersion = '8.5.0'
+    butterknifeVersion = '8.5.1'
     dexmakerVersion = '1.2'
 }

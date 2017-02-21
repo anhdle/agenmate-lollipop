@@ -13,6 +13,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.agenmate.lollipop.R;
+import com.agenmate.lollipop.util.FontUtils;
 import com.agenmate.lollipop.util.ViewUtils;
 public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBarChangeListener {
     public static final int         NOT_INITIALIZED_THUMB_POSITION  = -1;
@@ -197,11 +198,13 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
         textIndicator.setText(mItems[index]);
         textIndicator.setTextSize(mTextSize / mDensity);
         textIndicator.setTextColor(mTextIndicatorColor);
+
         if (Build.VERSION.SDK_INT < 23) {
             textIndicator.setTextAppearance(mContext, mTextStyleId);
         } else {
             textIndicator.setTextAppearance(mTextStyleId);
         }
+        textIndicator.setTypeface(FontUtils.get(getContext(), "Dudu"));
         textParams.topMargin = (int) mTextIndicatorTopMargin;
         addView(textIndicator, textParams);
         ViewUtils.waitForLayoutPrepared(textIndicator, createTextIndicatorLayoutPreparedListener(numberLeftMargin));

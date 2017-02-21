@@ -12,20 +12,22 @@
         custom:toDegrees="360.0" />
 
     <FrameLayout
-        android:alpha="0.2"
+        android:elevation="4dp"
         android:id="@+id/control_layout"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_centerInParent="true"
-        android:background="@mipmap/ic_launcher" >
+        android:background="@drawable/round_button"
+         >
 
         <ImageView
+            android:elevation="4dp"
             android:id="@+id/control_hint"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:duplicateParentState="true"
-            android:background="@drawable/round_button"
+
       />
     </FrameLayout>
 

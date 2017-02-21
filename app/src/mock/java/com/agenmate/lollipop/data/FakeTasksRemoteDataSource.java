@@ -19,9 +19,7 @@ package com.agenmate.lollipop.data;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
-import com.agenmate.lollipop.data.Task;
 import com.agenmate.lollipop.data.source.TasksDataSource;
-import com.google.common.collect.Lists;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -61,27 +59,27 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public void completeTask(@NonNull Task task) {
-        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getColor(), task.getDueAt(), task.hasAlarm(), task.getId(), true);
         TASKS_SERVICE_DATA.put(task.getId(), completedTask);
     }
 
     @Override
     public void completeTask(@NonNull String taskId) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getId(), true);
+        Task completedTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getColor(), task.getDueAt(), task.hasAlarm(), task.getId(), true);
         TASKS_SERVICE_DATA.put(taskId, completedTask);
     }
 
     @Override
     public void activateTask(@NonNull Task task) {
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getColor(), task.getDueAt(), task.hasAlarm(), task.getId());
         TASKS_SERVICE_DATA.put(task.getId(), activeTask);
     }
 
     @Override
     public void activateTask(@NonNull String taskId) {
         Task task = TASKS_SERVICE_DATA.get(taskId);
-        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getId());
+        Task activeTask = new Task(task.getTitle(), task.getDescription(), task.getPriority(), task.getColor(), task.getDueAt(), task.hasAlarm(), task.getId());
         TASKS_SERVICE_DATA.put(taskId, activeTask);
     }
 

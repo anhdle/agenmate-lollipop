@@ -68,11 +68,13 @@ public class TasksLocalDataSource implements TasksDataSource {
     private Task getTask(@NonNull Cursor c) {
         String itemId = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_ENTRY_ID));
         String title = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_TITLE));
-        String description =
-                c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
-        boolean completed =
-                c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
-        return new Task(title, description, itemId, completed);
+        String description = c.getString(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DESCRIPTION));
+        int priority = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_PRIORITY));
+        int color = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COLOR));
+        long dueAt = c.getLong(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_DUE_AT));
+        boolean hasAlarm = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_HAS_ALARM)) == 1;
+        boolean completed = c.getInt(c.getColumnIndexOrThrow(TaskEntry.COLUMN_NAME_COMPLETED)) == 1;
+        return new Task(title, description, priority, color, dueAt, hasAlarm, itemId, completed);
     }
 
     @Override
@@ -81,6 +83,10 @@ public class TasksLocalDataSource implements TasksDataSource {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
                 TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TaskEntry.COLUMN_NAME_PRIORITY,
+                TaskEntry.COLUMN_NAME_COLOR,
+                TaskEntry.COLUMN_NAME_DUE_AT,
+                TaskEntry.COLUMN_NAME_HAS_ALARM,
                 TaskEntry.COLUMN_NAME_COMPLETED
         };
         String sql = String.format("SELECT %s FROM %s", TextUtils.join(",", projection), TaskEntry.TABLE_NAME);
@@ -94,6 +100,10 @@ public class TasksLocalDataSource implements TasksDataSource {
                 TaskEntry.COLUMN_NAME_ENTRY_ID,
                 TaskEntry.COLUMN_NAME_TITLE,
                 TaskEntry.COLUMN_NAME_DESCRIPTION,
+                TaskEntry.COLUMN_NAME_PRIORITY,
+                TaskEntry.COLUMN_NAME_COLOR,
+                TaskEntry.COLUMN_NAME_DUE_AT,
+                TaskEntry.COLUMN_NAME_HAS_ALARM,
                 TaskEntry.COLUMN_NAME_COMPLETED
         };
         String sql = String.format("SELECT %s FROM %s WHERE %s LIKE ?",
@@ -109,6 +119,10 @@ public class TasksLocalDataSource implements TasksDataSource {
         values.put(TaskEntry.COLUMN_NAME_ENTRY_ID, task.getId());
         values.put(TaskEntry.COLUMN_NAME_TITLE, task.getTitle());
         values.put(TaskEntry.COLUMN_NAME_DESCRIPTION, task.getDescription());
+        values.put(TaskEntry.COLUMN_NAME_PRIORITY, task.getPriority());
+        values.put(TaskEntry.COLUMN_NAME_COLOR, task.getColor());
+        values.put(TaskEntry.COLUMN_NAME_DUE_AT, task.getDueAt());
+        values.put(TaskEntry.COLUMN_NAME_HAS_ALARM, task.hasAlarm());
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
         mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
     }

@@ -1,4 +1,4 @@
-/*
+ /*
  * Copyright (C) 2012 Capricorn
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ package com.agenmate.lollipop.ui.layout;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -62,6 +63,11 @@ public class ArcMenu extends RelativeLayout {
         controlLayout.setOnClickListener(listener);
     }
 
+    public void setControlLayoutDrawable(int drawableId){
+        mHintView.setImageResource(drawableId);
+        controlLayout.setVisibility(VISIBLE);
+    }
+
     private void init(Context context) {
         LayoutInflater li = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         li.inflate(R.layout.arc_menu, this);
@@ -69,6 +75,7 @@ public class ArcMenu extends RelativeLayout {
         mArcLayout = (ArcLayout) findViewById(R.id.item_layout);
 
         controlLayout = (ViewGroup) findViewById(R.id.control_layout);
+        controlLayout.setVisibility(GONE);
         /*controlLayout.setClickable(true);
         controlLayout.setOnTouchListener(new OnTouchListener() {
 
