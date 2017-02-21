@@ -412,12 +412,12 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
     @Override
     public void setTitle(String title) {
-        titleText.setText(title);
+        titleEdit.setText(title);
     }
 
     @Override
     public void setDescription(String description) {
-        descText.setText(description);
+        descEdit.setText(description);
     }
 
     @Override
@@ -543,6 +543,8 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
             }
         }
     }
+
+
 
 
 }

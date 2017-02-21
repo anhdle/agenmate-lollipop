@@ -89,25 +89,22 @@ public class ListActivity extends BaseActivity {
         actionBar.setHomeButtonEnabled(false); // disable the button
         actionBar.setDisplayHomeAsUpEnabled(false); // remove the left caret
         actionBar.setDisplayShowHomeEnabled(false); // remove the icon
-
-        tabLayout.setVisibility(View.GONE);
-
         actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + "'#ffffff'" +">AgenMate</font>"));
-
+        tabLayout.setVisibility(View.GONE);
 
         // TODO finish drawerlayout menu later for remote and profile
         mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED); // temp
-        //drawerArrowDrawable = new DrawerArrowDrawable(this);
-        // drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open,  R.string.drawer_close);
-        //mDrawerLayout.addDrawerListener(drawerToggle);
-        //drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);
+        /*drawerArrowDrawable = new DrawerArrowDrawable(this);
+        drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open,  R.string.drawer_close);
+        mDrawerLayout.addDrawerListener(drawerToggle);
+        drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);*/
 
         sheetLayout.setFab(fab);
         sheetLayout.setFabAnimationEndListener(new SheetLayout.OnFabAnimationEndListener() {
             @Override
             public void onFabAnimationEnd() {
-                Intent intent = new Intent(getBaseContext(), AddEditActivity.class);
-                startActivity(intent);
+                orderedFragment.showAddTask();
+
             }
         });
         fab.setVisibility(View.INVISIBLE);
@@ -129,13 +126,9 @@ public class ListActivity extends BaseActivity {
             mListPresenter.setFiltering(currentFiltering);
         }
 
-        if (navigationView != null) {
-            setupDrawerContent(navigationView);
-        }
 
-        if (viewPager != null) {
-            setupViewPager(viewPager);
-        }
+        setupDrawerContent(navigationView);
+        setupViewPager(viewPager);
 
         floatingImage.setOnClickListener(v -> startAnimation(floatingImage));
     }
