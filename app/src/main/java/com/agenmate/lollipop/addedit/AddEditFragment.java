@@ -52,7 +52,6 @@ import com.agenmate.lollipop.util.ScreenUtils;
 
 import net.danlew.android.joda.DateUtils;
 
-import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
 
 import java.util.Calendar;
@@ -86,6 +85,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     private Unbinder unbinder;
     private DateTime setTime;
     private int timeFormat;
+    private String taskId;
 
     @BindViews({ R.id.title_text_view, R.id.title_card_view, R.id.desc_text_view, R.id.desc_card_view, R.id.priority_text_view, R.id.priority_card_view, R.id.color_text_view}) List<View> bottomViews;
 
@@ -349,7 +349,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                     case BottomSheetBehavior.STATE_DRAGGING:
                         Log.v("drag", "ae");
                         dueDateStatus.setText("");
-                        //if (showFAB) fab.startAnimation(shrinkAnimation);
                         break;
 
                     case BottomSheetBehavior.STATE_COLLAPSED:
@@ -362,10 +361,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                             Log.v("collapse", "c");
                         }
 
-
-                      /*  showFAB = true;
-                        fab.setVisibility(View.VISIBLE);
-                        fab.startAnimation(growAnimation);*/
                         break;
 
                     case BottomSheetBehavior.STATE_EXPANDED:
@@ -377,7 +372,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                             if(!timeMenu.isExpanded()) timePickerLayout.getDayArcMenu().switchState();
                         }
 
-                      //  showFAB = false;
                         break;
 
 
@@ -480,8 +474,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                 getActivity().onBackPressed();
                 return true;
             case R.id.action_save:
-                // TODO Action save
-
                 String title = emptyStringChecker(titleEdit.getText().toString());
                 if(title == null) {
                     Snackbar.make(background, "Title can't be Empty", Snackbar.LENGTH_LONG).show();

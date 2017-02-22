@@ -1,5 +1,7 @@
 package com.agenmate.lollipop.list;
 
+import android.content.Context;
+
 import com.agenmate.lollipop.app.AppController;
 import com.agenmate.lollipop.data.source.TasksRepositoryComponent;
 import com.agenmate.lollipop.util.FragmentScoped;
@@ -18,4 +20,6 @@ import dagger.Component;
 public interface ListComponent {
 	
     void inject(ListActivity activity);
+
+    Context getContext();
 }

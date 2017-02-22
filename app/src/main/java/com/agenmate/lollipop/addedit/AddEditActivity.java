@@ -17,8 +17,6 @@
 package com.agenmate.lollipop.addedit;
 
 import android.annotation.SuppressLint;
-import android.app.SearchManager;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -34,10 +32,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.SearchView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.alarm.BaseAlarmController;
@@ -58,6 +54,7 @@ import butterknife.ButterKnife;
 public class AddEditActivity extends BaseActivity {
 
     public static final int REQUEST_ADD_TASK = 1;
+    public static final int REQUEST_EDIT_TASK = 2;
     private AddEditFragment addEditFragment;
     private Menu menu;
 
@@ -66,6 +63,7 @@ public class AddEditActivity extends BaseActivity {
     @BindView(R.id.appbar) AppBarLayout appBar;
     @BindView(R.id.toolbar) Toolbar toolbar;
     private ActionBar actionBar;
+    private String taskId;
 
     private int[] colorBarIds = {R.color.md_red_700, R.color.md_orange_700, R.color.md_yellow_700, R.color.md_green_700, R.color.md_blue_700, R.color.md_indigo_700, R.color.md_deep_purple_700};
     private int[] colorStatusIds = {R.color.md_red_900, R.color.md_orange_900, R.color.md_yellow_900, R.color.md_green_900, R.color.md_blue_900, R.color.md_indigo_900, R.color.md_deep_purple_900};
@@ -85,7 +83,7 @@ public class AddEditActivity extends BaseActivity {
         actionBar.setDisplayShowHomeEnabled(true);
 
         addEditFragment = (AddEditFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
-        String taskId = getIntent().getStringExtra(AddEditFragment.ARGUMENT_EDIT_TASK_ID);
+        taskId = getIntent().getStringExtra(AddEditFragment.ARGUMENT_EDIT_TASK_ID);
 
         if (addEditFragment == null) {
             addEditFragment = AddEditFragment.newInstance();
@@ -161,7 +159,8 @@ public class AddEditActivity extends BaseActivity {
         inflater.inflate(R.menu.add_edit_actions, menu);
         this.menu = menu;
         alarmIcon = menu.findItem(R.id.action_alarm);
-        alarmIcon.setVisible(true);
+        alarmIcon.setVisible(false);
+        if(taskId == null) menu.findItem(R.id.action_alarm).setVisible(false);
         addEditFragment.onOptionsCreated();
 
         return super.onCreateOptionsMenu(menu);

@@ -22,7 +22,6 @@ import android.support.annotation.VisibleForTesting;
 
 import com.agenmate.lollipop.data.Task;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,9 +104,13 @@ public class TasksRepository implements TasksDataSource {
         }
 
 
-        {
+        if(mCacheIsDirty){
+            return Observable.from(mCachedTasks.values()).toList().doOnCompleted(()-> mCacheIsDirty = false);
+        } else {
+
             // Query the local storage if available. If not, query the network.
             Observable<List<Task>> localTasks = getAndCacheLocalTasks();
+
             return Observable.concat(localTasks, null)
                     .filter(tasks -> !tasks.isEmpty())
                     .first();
@@ -119,6 +122,8 @@ public class TasksRepository implements TasksDataSource {
                 .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
                     @Override
                     public Observable<List<Task>> call(List<Task> tasks) {
+
+                        //if(tasks.size() == 0) return null;
                         return Observable.from(tasks)
                                 .doOnNext(task -> mCachedTasks.put(task.getId(), task))
                                 .toList();

@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -30,6 +29,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +37,7 @@ import android.widget.ImageView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.addedit.AddEditActivity;
+import com.agenmate.lollipop.addedit.AddEditFragment;
 import com.agenmate.lollipop.data.Task;
 
 import java.util.ArrayList;
@@ -54,10 +55,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 public class ListFragment extends Fragment implements ListContract.View  {
 
-    private static final String TAG = "RecyclerViewFragment";
-    private static final String KEY_LAYOUT_MANAGER = "layoutManager";
-    private static final int SPAN_COUNT = 2;
+    private static final String TAG = "ListFragment";
 
+    // TODO disbale loading
     protected TasksAdapter tasksAdapter;
     protected LinearLayoutManager mLayoutManager;
     private ListContract.Presenter mPresenter;
@@ -117,10 +117,7 @@ public class ListFragment extends Fragment implements ListContract.View  {
         mPresenter = checkNotNull(presenter);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
-    }
+
 
     @Nullable
     @Override
@@ -131,16 +128,13 @@ public class ListFragment extends Fragment implements ListContract.View  {
         unbinder = ButterKnife.bind(this, rootView);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
-
-        int scrollPosition = 0;
-
-
+        //int scrollPosition = 0;
         /*if (mRecyclerView.getLayoutManager() != null) {
             scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastVisibleItemPosition();
         }*/
 
         mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.scrollToPosition(scrollPosition);
+        //mRecyclerView.scrollToPosition(scrollPosition);
         mRecyclerView.setAdapter(tasksAdapter);
         //mLayoutManager.setStackFromEnd(true);
 
@@ -149,11 +143,6 @@ public class ListFragment extends Fragment implements ListContract.View  {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                /*for (int i = 0; i < DATASET_COUNT; i++) {
-                    mDataset.add(i, "This is element #" + (i + 60));
-                    tasksAdapter.notifyItemChanged(i);
-                }*/
-
                 //swipeRefreshLayout.setRefreshing(false);
                 mPresenter.loadTasks(false);
             }
@@ -169,8 +158,6 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        // Save currently selected layout manager.
-        //savedInstanceState.putSerializable(KEY_LAYOUT_MANAGER, mCurrentLayoutManagerType);
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -202,14 +189,21 @@ public class ListFragment extends Fragment implements ListContract.View  {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        mPresenter.result(requestCode, resultCode);
+    }
+
+    @Override
     public void showAddTask() {
         Intent intent = new Intent(getActivity(), AddEditActivity.class);
         startActivityForResult(intent, AddEditActivity.REQUEST_ADD_TASK);
     }
 
     @Override
-    public void showTaskDetailsUi(String taskId) {
-
+    public void showEditTask(String taskId) {
+        Intent intent = new Intent(getContext(), AddEditActivity.class);
+        intent.putExtra(AddEditFragment.ARGUMENT_EDIT_TASK_ID, taskId);
+        startActivityForResult(intent, AddEditActivity.REQUEST_EDIT_TASK);
     }
 
     @Override
@@ -228,13 +222,16 @@ public class ListFragment extends Fragment implements ListContract.View  {
     }
 
     @Override
-    public void showLoadingTasksError() {
+    public void showLoadingTasksError(){
+        Log.v("taskerror", "Aa");
         showMessage("Oops!");
     }
 
     @Override
     public void showNoTasks() {
-
+        if (swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
@@ -263,8 +260,8 @@ public class ListFragment extends Fragment implements ListContract.View  {
     }
 
     @Override
-    public void showSuccessfullySavedMessage() {
-        showMessage("New Task Added!");
+    public void showSuccessfullySavedMessage(boolean isNew) {
+        showMessage(isNew ? "New Task Added!" : "Task Updated!");
     }
 
     @Override
@@ -302,4 +299,6 @@ public class ListFragment extends Fragment implements ListContract.View  {
             ((Animatable) drawable).start();
         }
     }
+
+
 }

@@ -2,6 +2,7 @@ package com.agenmate.lollipop.list;
 
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
             descText = (TextView)view.findViewById(R.id.desc_text);
             priorityText = (TextView)view.findViewById(R.id.priority_text);
             balloon = (ImageView)view.findViewById(R.id.balloon);
+
         }
 
         public TextView getTitleText() {
@@ -81,10 +83,15 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        Task task = tasks.get(position);
-        viewHolder.getTitleText().setText(tasks.get(position).getTitle());
-        viewHolder.getDescText().setText((tasks.get(position).getDescription()));
-        viewHolder.getPriorityText().setText((getPriorityText(tasks.get(position).getPriority())));
+        final Task task = tasks.get(position);
+        viewHolder.getTitleText().setText(task.getTitle());
+        viewHolder.getDescText().setText((task.getDescription()));
+        viewHolder.getPriorityText().setText((getPriorityText(task.getPriority())));
+        viewHolder.getBalloon().setOnClickListener(v -> {
+            Log.v("click", String.valueOf(task));
+            itemListener.onTaskClick(task);
+
+        });
         //viewHolder.getBalloon().setImageResource();
 
         // to finish

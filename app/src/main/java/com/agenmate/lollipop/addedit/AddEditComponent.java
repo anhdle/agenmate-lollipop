@@ -1,5 +1,7 @@
 package com.agenmate.lollipop.addedit;
 
+import android.content.Context;
+
 import com.agenmate.lollipop.app.AppController;
 import com.agenmate.lollipop.data.source.TasksRepositoryComponent;
 import com.agenmate.lollipop.util.FragmentScoped;
@@ -15,8 +17,10 @@ import dagger.Component;
  */
 @FragmentScoped
 @Component(dependencies = TasksRepositoryComponent.class,
-        modules = AddEditPresenterModule.class)
+        modules = {AddEditPresenterModule.class})
 public interface AddEditComponent {
 
     void inject(AddEditActivity addEditActivity);
+
+    Context getContext();
 }

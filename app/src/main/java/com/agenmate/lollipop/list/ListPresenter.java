@@ -17,7 +17,9 @@
 package com.agenmate.lollipop.list;
 
 import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.agenmate.lollipop.addedit.AddEditActivity;
 import com.agenmate.lollipop.data.Task;
@@ -55,7 +57,7 @@ final class ListPresenter implements ListContract.Presenter {
     private final TasksRepository mTasksRepository;
 
     @NonNull
-    private final ListContract.View mTasksView;
+    private final ListContract.View listView;
 
     @NonNull
     private final BaseSchedulerProvider mSchedulerProvider;
@@ -63,10 +65,11 @@ final class ListPresenter implements ListContract.Presenter {
     @NonNull
     private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
 
-    private boolean mFirstLoad = false;
-
     @NonNull
     private CompositeSubscription mSubscriptions;
+
+    @Inject
+    Context context;
 
     /**
      * Dagger strictly enforces that arguments not marked with {@code @Nullable} are not injected
@@ -77,7 +80,7 @@ final class ListPresenter implements ListContract.Presenter {
                   @NonNull ListContract.View tasksView,
                   @NonNull BaseSchedulerProvider schedulerProvider) {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
-        mTasksView = checkNotNull(tasksView, "tasksView cannot be null!");
+        listView = checkNotNull(tasksView, "tasksView cannot be null!");
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
         mSubscriptions = new CompositeSubscription();
     }
@@ -88,7 +91,7 @@ final class ListPresenter implements ListContract.Presenter {
      */
     @Inject
     void setupListeners() {
-        mTasksView.setPresenter(this);
+        listView.setPresenter(this);
     }
 
     @Override
@@ -104,18 +107,36 @@ final class ListPresenter implements ListContract.Presenter {
 
     @Override
     public void result(int requestCode, int resultCode) {
-        // If a task was successfully added, show snackbar
-        if (AddEditActivity.REQUEST_ADD_TASK == requestCode
-                && Activity.RESULT_OK == resultCode) {
-            mTasksView.showSuccessfullySavedMessage();
+        if(Activity.RESULT_OK == resultCode){
+            switch (requestCode){
+                case AddEditActivity.REQUEST_ADD_TASK:
+                    listView.showSuccessfullySavedMessage(true);
+                    break;
+                case AddEditActivity.REQUEST_EDIT_TASK:
+                    listView.showSuccessfullySavedMessage(false);
+                    break;
+            }
         }
     }
 
     @Override
     public void loadTasks(boolean forceUpdate) {
-        // Simplification for sample: a network reload will be forced on first load.
-        loadTasks(forceUpdate || mFirstLoad, true);
-        mFirstLoad = false;
+        boolean mFirstLoad = context.getSharedPreferences("com.agenmate.lollipop", Context.MODE_PRIVATE)
+                .getBoolean("firsLoad", false);
+        Log.v("firstLoad", String.valueOf(mFirstLoad));
+
+        loadTasks(forceUpdate || !mFirstLoad, true);
+        if(!mFirstLoad){
+            context.getSharedPreferences("com.agenmate.lollipop", Context.MODE_PRIVATE)
+                    .edit()
+                    .putBoolean("firstLoad", true)
+                    .apply();
+            /*boolean firstLoad = context.getSharedPreferences("com.agenmate.lollipop", Context.MODE_PRIVATE)
+                    .getBoolean("firsLoad", false);*/
+           // Log.v("firstLoadIn", String.valueOf(firstLoad));
+
+        }
+
     }
 
     /**
@@ -123,27 +144,32 @@ final class ListPresenter implements ListContract.Presenter {
      * @param showLoadingUI Pass in true to display a loading icon in the UI
      */
     private void loadTasks(final boolean forceUpdate, final boolean showLoadingUI) {
-        if (showLoadingUI) {
-            mTasksView.setLoadingIndicator(true);
+        Log.v("process task", "load");
+        if (showLoadingUI) {//TODO turn off indicator loading
+            listView.setLoadingIndicator(true);
         }
         if (forceUpdate) {
+            Log.v("process task", "forced");
             mTasksRepository.refreshTasks();
         }
-
+        Log.v("process task", "loaded");
         // The network request might be handled in a different thread so make sure Espresso knows
         // that the app is busy until the response is handled.
         EspressoIdlingResource.increment(); // App is busy until further notice
-
+        Log.v("process task", "loaded2");
         mSubscriptions.clear();
+        Log.v("protaskrepo", String.valueOf(mTasksRepository));
         Subscription subscription = mTasksRepository
                 .getTasks()
                 .flatMap(new Func1<List<Task>, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(List<Task> tasks) {
+                        Log.v("procallp", String.valueOf(tasks));
                         return Observable.from(tasks);
                     }
                 })
                 .filter(task -> {
+                    Log.v("filter", String.valueOf(mCurrentFiltering));
                     switch (mCurrentFiltering) {
                         case ACTIVE_TASKS:
                             return task.isActive();
@@ -158,6 +184,7 @@ final class ListPresenter implements ListContract.Presenter {
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
                 .doOnTerminate(() -> {
+                    Log.v("process task", "term");
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
@@ -166,19 +193,21 @@ final class ListPresenter implements ListContract.Presenter {
                         // onNext
                         this::processTasks,
                         // onError
-                        throwable -> mTasksView.showLoadingTasksError(),
+                        throwable -> listView.showLoadingTasksError(),
                         // onCompleted
-                        () -> mTasksView.setLoadingIndicator(false));
+                        () -> listView.setLoadingIndicator(false));
+        Log.v("subc", String.valueOf(subscription));
         mSubscriptions.add(subscription);
     }
 
     private void processTasks(List<Task> tasks) {
+        Log.v("process task", "a");
         if (tasks.isEmpty()) {
-            // Show a message indicating there are no tasks for that filter type.
+
             processEmptyTasks();
         } else {
             // Show the list of tasks
-            mTasksView.showTasks(tasks);
+            listView.showTasks(tasks);
             // Set the filter label's text.
             showFilterLabel();
         }
@@ -187,13 +216,13 @@ final class ListPresenter implements ListContract.Presenter {
     private void showFilterLabel() {
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
-                mTasksView.showActiveFilterLabel();
+                listView.showActiveFilterLabel();
                 break;
             case COMPLETED_TASKS:
-                mTasksView.showCompletedFilterLabel();
+                listView.showCompletedFilterLabel();
                 break;
             default:
-                mTasksView.showAllFilterLabel();
+                listView.showAllFilterLabel();
                 break;
         }
     }
@@ -201,33 +230,33 @@ final class ListPresenter implements ListContract.Presenter {
     private void processEmptyTasks() {
         switch (mCurrentFiltering) {
             case ACTIVE_TASKS:
-                mTasksView.showNoActiveTasks();
+                listView.showNoActiveTasks();
                 break;
             case COMPLETED_TASKS:
-                mTasksView.showNoCompletedTasks();
+                listView.showNoCompletedTasks();
                 break;
             default:
-                mTasksView.showNoTasks();
+                listView.showNoTasks();
                 break;
         }
     }
 
     @Override
     public void addNewTask() {
-        mTasksView.showAddTask();
+        listView.showAddTask();
     }
 
     @Override
     public void openTaskDetails(@NonNull Task requestedTask) {
         checkNotNull(requestedTask, "requestedTask cannot be null!");
-        mTasksView.showTaskDetailsUi(requestedTask.getId());
+        listView.showEditTask(requestedTask.getId());
     }
 
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
         mTasksRepository.completeTask(completedTask);
-        mTasksView.showTaskMarkedComplete();
+        listView.showTaskMarkedComplete();
         loadTasks(false, false);
     }
 
@@ -235,14 +264,14 @@ final class ListPresenter implements ListContract.Presenter {
     public void activateTask(@NonNull Task activeTask) {
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
-        mTasksView.showTaskMarkedActive();
+        listView.showTaskMarkedActive();
         loadTasks(false, false);
     }
 
     @Override
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
-        mTasksView.showCompletedTasksCleared();
+        listView.showCompletedTasksCleared();
         loadTasks(false, false);
     }
 

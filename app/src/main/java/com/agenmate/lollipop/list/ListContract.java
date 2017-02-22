@@ -37,7 +37,7 @@ public interface ListContract {
 
         void showAddTask();
 
-        void showTaskDetailsUi(String taskId);
+        void showEditTask(String taskId);
 
         void showTaskMarkedComplete();
 
@@ -59,7 +59,7 @@ public interface ListContract {
 
         void showNoCompletedTasks();
 
-        void showSuccessfullySavedMessage();
+        void showSuccessfullySavedMessage(boolean isNew);
 
         boolean isActive();
 

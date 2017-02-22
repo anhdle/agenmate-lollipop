@@ -5,6 +5,12 @@
         android:icon="@drawable/ic_save"
         android:title="Save"
         app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_delete"
+        android:icon="@drawable/ic_trash"
+        android:title="Delete"
+        app:showAsAction="ifRoom" />
+
     <item android:id="@+id/action_alarm"
         android:icon="@drawable/ic_alarm_off"
         android:title="Alarm"
