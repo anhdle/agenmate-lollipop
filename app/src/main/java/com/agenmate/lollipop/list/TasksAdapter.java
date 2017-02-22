@@ -2,7 +2,6 @@ package com.agenmate.lollipop.list;
 
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +32,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         private final TextView descText;
         private final TextView priorityText;
         private final ImageView balloon;
+        private final ImageView alarm;
+        private final ImageView trash;
 
         public ViewHolder(View view) {
             super(view);
@@ -40,6 +41,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
             descText = (TextView)view.findViewById(R.id.desc_text);
             priorityText = (TextView)view.findViewById(R.id.priority_text);
             balloon = (ImageView)view.findViewById(R.id.balloon);
+            alarm = (ImageView)view.findViewById(R.id.alarm_button);
+            trash = (ImageView)view.findViewById(R.id.delete_button);
 
         }
 
@@ -58,6 +61,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         public ImageView getBalloon() {
             return balloon;
         }
+
+        public ImageView getAlarm() { return alarm;}
+
+        public ImageView getTrash() {return trash; }
     }
 
     public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
@@ -88,9 +95,21 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         viewHolder.getDescText().setText((task.getDescription()));
         viewHolder.getPriorityText().setText((getPriorityText(task.getPriority())));
         viewHolder.getBalloon().setOnClickListener(v -> {
-            Log.v("click", String.valueOf(task));
             itemListener.onTaskClick(task);
-
+        });
+        final ImageView alarm = viewHolder.getAlarm();
+        alarm.setVisibility(task.hasAlarm() ? View.VISIBLE : View.GONE);
+        alarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO toggle alarm
+            }
+        });
+        viewHolder.getTrash().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                itemListener.onTaskDelete(task);
+            }
         });
         //viewHolder.getBalloon().setImageResource();
 
@@ -128,9 +147,5 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
     private Drawable getBalloonDrawable(){
         return null;
     }
-
-
-
-
 }
 

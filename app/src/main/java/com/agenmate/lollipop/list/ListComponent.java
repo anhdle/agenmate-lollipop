@@ -1,6 +1,7 @@
 package com.agenmate.lollipop.list;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import com.agenmate.lollipop.app.AppController;
 import com.agenmate.lollipop.data.source.TasksRepositoryComponent;
@@ -22,4 +23,6 @@ public interface ListComponent {
     void inject(ListActivity activity);
 
     Context getContext();
+
+    SharedPreferences getSharedPreferences();
 }

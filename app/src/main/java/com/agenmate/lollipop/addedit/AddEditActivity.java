@@ -84,6 +84,7 @@ public class AddEditActivity extends BaseActivity {
 
         addEditFragment = (AddEditFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
         taskId = getIntent().getStringExtra(AddEditFragment.ARGUMENT_EDIT_TASK_ID);
+        Log.v("tagId", String.valueOf(taskId));
 
         if (addEditFragment == null) {
             addEditFragment = AddEditFragment.newInstance();
@@ -160,7 +161,7 @@ public class AddEditActivity extends BaseActivity {
         this.menu = menu;
         alarmIcon = menu.findItem(R.id.action_alarm);
         alarmIcon.setVisible(false);
-        if(taskId == null) menu.findItem(R.id.action_alarm).setVisible(false);
+        if(taskId == null) menu.findItem(R.id.action_delete).setVisible(false);
         addEditFragment.onOptionsCreated();
 
         return super.onCreateOptionsMenu(menu);

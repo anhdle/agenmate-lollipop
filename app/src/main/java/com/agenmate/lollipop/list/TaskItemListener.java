@@ -10,6 +10,8 @@ public interface TaskItemListener {
 
     void onTaskClick(Task clickedTask);
 
+    void onTaskDelete(Task deletedTask);
+
     void onCompleteTaskClick(Task completedTask);
 
     void onActivateTaskClick(Task activatedTask);

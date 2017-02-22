@@ -24,6 +24,7 @@ import com.agenmate.lollipop.data.Task;
 import com.agenmate.lollipop.data.source.TasksDataSource;
 import com.agenmate.lollipop.data.source.TasksRepository;
 import com.agenmate.lollipop.util.schedulers.BaseSchedulerProvider;
+import com.google.common.base.Strings;
 
 import javax.inject.Inject;
 
@@ -56,7 +57,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
     private final BaseSchedulerProvider mSchedulerProvider;
 
     @Nullable
-    private String mTaskId;
+    private String taskId;
 
     private boolean mIsDataMissing;
 
@@ -76,7 +77,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
                      @NonNull AddEditContract.View addTaskView,
                      @NonNull BaseSchedulerProvider schedulerProvider,
                      @NonNull BaseAlarmController alarmController) {
-        mTaskId = taskId;
+        this.taskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
         mAddTaskView = checkNotNull(addTaskView);
         mSchedulerProvider = checkNotNull(schedulerProvider);
@@ -124,7 +125,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         }
 
         mSubscriptions.add(mTasksRepository
-                .getTask(mTaskId)
+                .getTask(taskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
                 .subscribe(
@@ -150,7 +151,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
     }
 
     private boolean isNewTask() {
-        return mTaskId == null;
+        return taskId == null;
     }
 
     private void createTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
@@ -167,11 +168,21 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        mTasksRepository.saveTask(new Task(title, description, priority, color, dueAt, hasAlarm, mTaskId));
+        mTasksRepository.saveTask(new Task(title, description, priority, color, dueAt, hasAlarm, taskId));
         mAddTaskView.showTasksList(); // After an edit, go back to the list.
     }
 
     public BaseAlarmController getAlarmController() {
         return alarmController;
+    }
+
+    @Override
+    public void deleteTask() {
+        if (Strings.isNullOrEmpty(taskId)) {
+            mAddTaskView.showMissingTask();
+            return;
+        }
+        mTasksRepository.deleteTask(taskId);
+        mAddTaskView.showTaskDeleted();
     }
 }

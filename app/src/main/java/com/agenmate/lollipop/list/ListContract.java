@@ -43,6 +43,8 @@ public interface ListContract {
 
         void showTaskMarkedActive();
 
+        void showTaskDeleted();
+
         void showCompletedTasksCleared();
 
         void showLoadingTasksError();
@@ -64,6 +66,8 @@ public interface ListContract {
         boolean isActive();
 
         void showFilteringPopUpMenu();
+
+        void showMissingTask();
     }
 
     interface Presenter extends BasePresenter {
@@ -79,6 +83,8 @@ public interface ListContract {
         void completeTask(@NonNull Task completedTask);
 
         void activateTask(@NonNull Task activeTask);
+
+        void deleteTask(String taskId);
 
         void clearCompletedTasks();
 

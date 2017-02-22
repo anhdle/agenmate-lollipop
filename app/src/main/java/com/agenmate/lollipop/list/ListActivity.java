@@ -105,7 +105,10 @@ public class ListActivity extends BaseActivity {
         });
         fab.setVisibility(View.INVISIBLE);
 
-        fab.setOnClickListener(view -> sheetLayout.expandFab());
+        fab.setOnClickListener(view -> {
+            fab.setImageDrawable(null);
+            sheetLayout.expandFab();
+        });
         tabLayout.setupWithViewPager(viewPager);
 
         orderedFragment = ListFragment.newInstance();
@@ -185,6 +188,6 @@ public class ListActivity extends BaseActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        fab.setImageResource(R.drawable.ic_add);
     }
 }

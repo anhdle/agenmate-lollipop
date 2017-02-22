@@ -32,11 +32,15 @@ public interface AddEditContract {
 
         void showTasksList();
 
+        void showMissingTask();
+
         void setTitle(String title);
 
         void setDescription(String description);
 
         boolean isActive();
+
+        void showTaskDeleted();
     }
 
     interface Presenter extends BasePresenter {
@@ -46,6 +50,8 @@ public interface AddEditContract {
         void populateTask();
 
         boolean isDataMissing();
+
+        void deleteTask();
 
         BaseAlarmController getAlarmController();
     }

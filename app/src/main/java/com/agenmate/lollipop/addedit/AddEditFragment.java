@@ -179,11 +179,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        /*FloatingActionButton fab =
-                (FloatingActionButton) getActivity().findViewById(R.id.fab_edit_task_done);
-       // fab.setImageResource(R.drawable.ic_done);
-        fab.setOnClickListener((View v) -> presenter.saveTask(mTitle.getText().toString(), mDescription.getText().toString()));*/
     }
 
     @Nullable
@@ -405,6 +400,11 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     }
 
     @Override
+    public void showMissingTask() {
+        titleEdit.setText("");
+    }
+
+    @Override
     public void setTitle(String title) {
         titleEdit.setText(title);
     }
@@ -417,6 +417,11 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     @Override
     public boolean isActive() {
         return isAdded();
+    }
+
+    @Override
+    public void showTaskDeleted() {
+        getActivity().finish();
     }
 
 
@@ -505,6 +510,10 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                 drawable.setColorFilter(setWhite ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
                 hasAlarm = !hasAlarm;
                 return true;
+
+            case R.id.action_delete:
+                presenter.deleteTask();
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -535,8 +544,4 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
             }
         }
     }
-
-
-
-
 }

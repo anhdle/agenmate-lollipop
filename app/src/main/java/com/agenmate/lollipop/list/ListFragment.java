@@ -78,6 +78,11 @@ public class ListFragment extends Fragment implements ListContract.View  {
         }
 
         @Override
+        public void onTaskDelete(Task deletedTask) {
+            mPresenter.deleteTask(deletedTask.getId());
+        }
+
+        @Override
         public void onCompleteTaskClick(Task completedTask) {
             mPresenter.completeTask(completedTask);
         }
@@ -91,33 +96,6 @@ public class ListFragment extends Fragment implements ListContract.View  {
     public static ListFragment newInstance() {
         return new ListFragment();
     }
-
-
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        tasksAdapter = new TasksAdapter(new ArrayList<Task>(0), taskItemListener);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.subscribe();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mPresenter.unsubscribe();
-    }
-
-    @Override
-    public void setPresenter(@NonNull ListContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
-    }
-
-
 
     @Nullable
     @Override
@@ -151,10 +129,32 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
         setHasOptionsMenu(true);
 
-
         return rootView;
     }
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        tasksAdapter = new TasksAdapter(new ArrayList<Task>(0), taskItemListener);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.subscribe();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mPresenter.unsubscribe();
+    }
+
+    @Override
+    public void setPresenter(@NonNull ListContract.Presenter presenter) {
+        mPresenter = checkNotNull(presenter);
+    }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -217,21 +217,23 @@ public class ListFragment extends Fragment implements ListContract.View  {
     }
 
     @Override
+    public void showTaskDeleted() {
+        showMessage("Task Deleted!");
+    }
+
+    @Override
     public void showCompletedTasksCleared() {
         showMessage("All Completed Tasks Cleared!");
     }
 
     @Override
     public void showLoadingTasksError(){
-        Log.v("taskerror", "Aa");
         showMessage("Oops!");
     }
 
     @Override
     public void showNoTasks() {
-        if (swipeRefreshLayout.isRefreshing()) {
-            swipeRefreshLayout.setRefreshing(false);
-        }
+       tasksAdapter.clear();
     }
 
     @Override
@@ -271,6 +273,11 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
     @Override
     public void showFilteringPopUpMenu() {
+
+    }
+
+    @Override
+    public void showMissingTask() {
 
     }
 
