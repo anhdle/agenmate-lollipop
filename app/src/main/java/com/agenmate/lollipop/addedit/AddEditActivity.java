@@ -108,8 +108,6 @@ public class AddEditActivity extends BaseActivity {
         }
 
 
-
-        // Create the presenter
         DaggerAddEditComponent.builder()
                 .addEditPresenterModule(
                         new AddEditPresenterModule(addEditFragment, taskId))

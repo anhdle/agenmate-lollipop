@@ -8,8 +8,6 @@
     android:animation="@anim/expand" />
   <target
       android:name="balloon_color"
-      android:animation="@animator/gray_to_pink" />
-  <target
-      android:name="balloon_frame"
-      android:animation="@animator/fill" />
+      android:animation="@animator/to_red" />
+
 </animated-vector>

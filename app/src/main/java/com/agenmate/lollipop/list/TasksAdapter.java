@@ -1,15 +1,24 @@
 package com.agenmate.lollipop.list;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.data.Task;
+import com.agenmate.lollipop.util.FontUtils;
+import com.agenmate.lollipop.util.MarkupUtils;
+import com.agenmate.lollipop.util.ScreenUtils;
 
 import java.util.List;
 
@@ -24,6 +33,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
 
     private List<Task> tasks;
     private TaskItemListener itemListener;
+    private Context context;
     /**
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
@@ -34,6 +44,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         private final ImageView balloon;
         private final ImageView alarm;
         private final ImageView trash;
+        private final FrameLayout balloonContainer;
 
         public ViewHolder(View view) {
             super(view);
@@ -43,6 +54,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
             balloon = (ImageView)view.findViewById(R.id.balloon);
             alarm = (ImageView)view.findViewById(R.id.alarm_button);
             trash = (ImageView)view.findViewById(R.id.delete_button);
+            balloonContainer = (FrameLayout)view.findViewById(R.id.balloon_container);
 
         }
 
@@ -65,10 +77,15 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         public ImageView getAlarm() { return alarm;}
 
         public ImageView getTrash() {return trash; }
+
+        public FrameLayout getBalloonContainer() {
+            return balloonContainer;
+        }
     }
 
-    public TasksAdapter(List<Task> tasks, TaskItemListener itemListener) {
+    public TasksAdapter(Context context, List<Task> tasks, TaskItemListener itemListener) {
         setList(tasks);
+        this.context = context;
         this.itemListener = itemListener;
     }
 
@@ -91,29 +108,23 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         final Task task = tasks.get(position);
-        viewHolder.getTitleText().setText(task.getTitle());
-        viewHolder.getDescText().setText((task.getDescription()));
-        viewHolder.getPriorityText().setText((getPriorityText(task.getPriority())));
-        viewHolder.getBalloon().setOnClickListener(v -> {
-            itemListener.onTaskClick(task);
-        });
+        final int priority = task.getPriority();
+        formatText(viewHolder.getTitleText(), "<b>"+ task.getTitle() + "</b>", Color.BLACK, 0);
+        formatText(viewHolder.getDescText(), task.getDescription(), Color.BLACK, 0);
+        formatText(viewHolder.getPriorityText(), getPriorityText(priority), Color.WHITE, priority);
+        final ImageView balloon = viewHolder.getBalloon();
+        int size = ScreenUtils.dpToPx(context, priority * 20 + 40);
+        balloon.setImageResource(balloonIds[task.getColor()]);
+        balloon.setLayoutParams(new FrameLayout.LayoutParams(size, size, Gravity.CENTER));
+        balloon.setOnClickListener(v -> itemListener.onTaskClick(task));
+        startAnimation(balloon);
         final ImageView alarm = viewHolder.getAlarm();
         alarm.setVisibility(task.hasAlarm() ? View.VISIBLE : View.GONE);
-        alarm.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO toggle alarm
-            }
+        alarm.setOnClickListener(v -> {
+            // TODO toggle alarm
         });
-        viewHolder.getTrash().setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                itemListener.onTaskDelete(task);
-            }
-        });
-        //viewHolder.getBalloon().setImageResource();
+        viewHolder.getTrash().setOnClickListener(v -> itemListener.onTaskDelete(task));
 
-        // to finish
          /*
         if (!task.isCompleted()) {
             itemListener.onCompleteTaskClick(task);
@@ -144,8 +155,23 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         }
     }
 
-    private Drawable getBalloonDrawable(){
-        return null;
+    private int[] balloonIds = { R.drawable.animated_balloon_red, R.drawable.animated_balloon_orange, R.drawable.animated_balloon_yellow, R.drawable.animated_balloon_green,
+                                R.drawable.animated_balloon_blue, R.drawable.animated_balloon_indigo, R.drawable.animated_balloon_purple} ;
+
+    private  void startAnimation(ImageView imageView) {
+        Drawable drawable = imageView.getDrawable();
+        if (drawable != null && drawable instanceof Animatable) {
+            ((Animatable) drawable).start();
+        }
+    }
+
+    private void formatText(TextView textView, String string, int color, int size){
+        if(string != null){
+            textView.setText(MarkupUtils.fromHtml(string));
+        }
+        textView.setTextColor(color);
+        textView.setTypeface(FontUtils.get(context, "Dudu"));
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20 + size * 5);
     }
 }
 

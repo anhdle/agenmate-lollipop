@@ -30,7 +30,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -106,7 +105,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
     private static final ButterKnife.Action<View> ALPHA_APPEAR = (view, index) -> {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-        //alphaAnimation.setFillBefore(true);
         alphaAnimation.setDuration(300);
         alphaAnimation.setStartOffset(index * 300);
         alphaAnimation.setFillAfter(true);
@@ -115,7 +113,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
     private final ButterKnife.Action<View> ALPHA_FADE = (view, index) -> {
         AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-        //alphaAnimation.setFillBefore(true);
         alphaAnimation.setDuration(250);
         alphaAnimation.setStartOffset(index * 250);
         alphaAnimation.setFillAfter(true);
@@ -155,9 +152,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         return new AddEditFragment();
     }
 
-    public AddEditFragment() {
-        // Required empty public constructor
-    }
+    public AddEditFragment() {}
 
     @Override
     public void onResume() {
@@ -228,7 +223,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         seekBar.setProgressDrawable(R.drawable.progress_bar);
         seekBar.setItems(new String[]{"Low", "Medium", "High"});
         seekBar.setProgress(0);
-        //seekBar.setProgressColor(Color.BLUE);
         seekBar.setTextIndicatorColor(Color.BLACK);
         seekBar.setIndicatorColor(ContextCompat.getColor(getActivity(), R.color.md_blue_grey_300));
         seekBar.setTextSize(14);
@@ -243,34 +237,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
       /*
 
-        alarmTextView = (TextView) root.findViewById(R.id.alarmText);
-        // set the alarm to the time that you picked
-        //calendar.add(Calendar.SECOND, 3);
-        alarmTimePicker = (TimePicker) root.findViewById(R.id.alarmTimePicker);
-        clockView = (ClockView)root.findViewById(R.id.clock_view);
-
-        clockView.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                Log.v("progresschange", String.valueOf(progress));
-                seekBar.setProgress(progress);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-                Log.v("progressstart", String.valueOf(seekBar.getProgress()));
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                Log.v("progressend", String.valueOf(seekBar.getProgress()));
-
-            }
-        });
-
-
-
-        Button start_alarm= (Button) root.findViewById(R.id.start_alarm);
+              Button start_alarm= (Button) root.findViewById(R.id.start_alarm);
         start_alarm.setOnClickListener(v -> {
             setAlarmText("Alarm set");
             int hour;
@@ -342,7 +309,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
                 switch (newState) {
                     case BottomSheetBehavior.STATE_DRAGGING:
-                        Log.v("drag", "ae");
                         dueDateStatus.setText("");
                         break;
 
@@ -353,7 +319,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                             onColorArcExpanded();
                             setDueDateText(dueDateStatus);
                             if(timeMenu.isExpanded())timeMenu.switchState();
-                            Log.v("collapse", "c");
                         }
 
                         break;
@@ -368,16 +333,12 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                         }
 
                         break;
-
-
                 }
 
             }
 
             @Override
-            public void onSlide(View bottomSheet, float slideOffset) {
-
-            }
+            public void onSlide(View bottomSheet, float slideOffset) {}
         });
 
         arcMenu.setOnArcAnimationEndListener(isExpanded -> {
@@ -441,8 +402,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
             colorButtons[i].setAlpha(1f);
             colorButtons[selectedColor].setAlpha(0.2f);
         }
-
-        //if(timeMenu.isExpanded())timeMenu.switchState();
     }
 
     private void formatText(TextView textView, String string){

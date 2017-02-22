@@ -2,7 +2,6 @@ package com.agenmate.lollipop.util;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.WindowManager;
 
 /**
@@ -15,9 +14,8 @@ public class ScreenUtils {
         DisplayMetrics dm = new DisplayMetrics();
         WindowManager manager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         manager.getDefaultDisplay().getMetrics(dm);
-        float dpHeight = dm.heightPixels / dm.density;
-        float dpWidth = dm.widthPixels / dm.density;
-        Log.v("width", String.valueOf(dpWidth));
+        //float dpHeight = dm.heightPixels / dm.density;
+        //float dpWidth = dm.widthPixels / dm.density;;
         return (int)((dp * dm.density) + 0.5);
     }
 }

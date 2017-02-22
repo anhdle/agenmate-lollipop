@@ -19,7 +19,6 @@ package com.agenmate.lollipop.list;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -37,7 +36,6 @@ import javax.inject.Inject;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Func1;
-import rx.functions.Func2;
 import rx.subscriptions.CompositeSubscription;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -67,10 +65,10 @@ final class ListPresenter implements ListContract.Presenter {
     private final BaseSchedulerProvider mSchedulerProvider;
 
     @NonNull
-    private TasksFilterType mCurrentFiltering = TasksFilterType.ALL_TASKS;
+    private TasksFilterType currentFiltering = TasksFilterType.ALL_TASKS;
 
     @NonNull
-    private CompositeSubscription mSubscriptions;
+    private CompositeSubscription subscriptions;
 
     @Inject
     Context context;
@@ -89,7 +87,7 @@ final class ListPresenter implements ListContract.Presenter {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         listView = checkNotNull(tasksView, "tasksView cannot be null!");
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
-        mSubscriptions = new CompositeSubscription();
+        subscriptions = new CompositeSubscription();
     }
 
     /**
@@ -108,7 +106,7 @@ final class ListPresenter implements ListContract.Presenter {
 
     @Override
     public void unsubscribe() {
-        mSubscriptions.clear();
+        subscriptions.clear();
     }
 
 
@@ -117,7 +115,7 @@ final class ListPresenter implements ListContract.Presenter {
         if(Activity.RESULT_OK == resultCode){
             switch (requestCode){
                 case AddEditActivity.REQUEST_ADD_TASK:
-                    if(mFirstLoad){
+                    if(firstLoad){
                         sharedPreferences.edit()
                                 .putBoolean("firstLoad", false)
                                 .apply();
@@ -131,24 +129,13 @@ final class ListPresenter implements ListContract.Presenter {
         }
     }
 
-    private boolean mFirstLoad;
+    private boolean firstLoad;
     @Override
     public void loadTasks(boolean forceUpdate) {
-        mFirstLoad = sharedPreferences
+        firstLoad = sharedPreferences
                 .getBoolean("firstLoad", true);
-        Log.v("firstLoad", String.valueOf(mFirstLoad));
 
-        loadTasks(forceUpdate || mFirstLoad, true);
-       /* if(!mFirstLoad){
-            sharedPreferences
-                    .edit()
-                    .putBoolean("firstLoad", true)
-                    .apply();
-
-           // Log.v("firstLoadIn", String.valueOf(firstLoad));
-
-        }*/
-
+        loadTasks(forceUpdate || firstLoad, true);
     }
 
 
@@ -164,21 +151,20 @@ final class ListPresenter implements ListContract.Presenter {
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
         }
-        // The network request might be handled in a different thread so make sure Espresso knows
-        // that the app is busy until the response is handled.
+
         EspressoIdlingResource.increment(); // App is busy until further notice
-        mSubscriptions.clear();
+        subscriptions.clear();
         Subscription subscription = mTasksRepository
                 .getTasks()
                 .flatMap(new Func1<List<Task>, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(List<Task> tasks) {
-                        Log.v("load", "flat");
+                        Log.v("tasksize", String.valueOf(tasks.size()));
                         return Observable.from(tasks);
                     }
                 })
                 .filter(task -> {
-                    switch (mCurrentFiltering) {
+                    switch (currentFiltering) {
                         case ACTIVE_TASKS:
                             return task.isActive();
                         case COMPLETED_TASKS:
@@ -188,13 +174,15 @@ final class ListPresenter implements ListContract.Presenter {
                             return true;
                     }
                 })
-                //.toList()
-                .toSortedList(new Func2<Task, Task, Integer>() {
-                    @Override
-                    public Integer call(Task task1, Task task2) {
-                        return Integer.valueOf(task2.getPriority()).compareTo(task1.getPriority());
+                .toSortedList((task1, task2) -> {
+                    Integer priorityValue = Integer.valueOf(task2.getPriority()).compareTo(task1.getPriority());
+                    if (priorityValue == 0) {
+                        int dueAtValue = Long.valueOf(task1.getDueAt()).compareTo(task2.getDueAt());
+                        return dueAtValue;
                     }
-                }).subscribeOn(mSchedulerProvider.computation())
+                    return priorityValue;
+                })
+                .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
                 .doOnTerminate(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
@@ -202,13 +190,10 @@ final class ListPresenter implements ListContract.Presenter {
                     }
                 })
                 .subscribe(
-                        // onNext
                         this::processTasks,
-                        // onError
                         throwable -> listView.showLoadingTasksError(),
-                        // onCompleted
                         () -> listView.setLoadingIndicator(false));
-        mSubscriptions.add(subscription);
+        subscriptions.add(subscription);
     }
 
     private void processTasks(List<Task> tasks) {
@@ -223,7 +208,7 @@ final class ListPresenter implements ListContract.Presenter {
     }
 
     private void showFilterLabel() {
-        switch (mCurrentFiltering) {
+        switch (currentFiltering) {
             case ACTIVE_TASKS:
                 listView.showActiveFilterLabel();
                 break;
@@ -237,7 +222,7 @@ final class ListPresenter implements ListContract.Presenter {
     }
 
     private void processEmptyTasks() {
-        switch (mCurrentFiltering) {
+        switch (currentFiltering) {
             case ACTIVE_TASKS:
                 listView.showNoActiveTasks();
                 break;
@@ -307,12 +292,12 @@ final class ListPresenter implements ListContract.Presenter {
      */
     @Override
     public void setFiltering(TasksFilterType requestType) {
-        mCurrentFiltering = requestType;
+        currentFiltering = requestType;
     }
 
     @Override
     public TasksFilterType getFiltering() {
-        return mCurrentFiltering;
+        return currentFiltering;
     }
 
 }

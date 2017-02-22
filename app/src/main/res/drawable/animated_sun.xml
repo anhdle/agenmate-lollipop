@@ -2,7 +2,7 @@
 <animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:drawable="@drawable/ic_sun">
     <target
-        android:animation="@animator/fill"
+        android:animation="@animator/fill_alpha"
         android:name="sun" />
     <target
         android:animation="@animator/colour"

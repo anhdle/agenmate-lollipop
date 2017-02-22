@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources"
+    android:drawable="@drawable/balloon">
+    <target
+        android:name="balloon_group"
+        android:animation="@anim/expand" />
+    <target
+        android:name="balloon_color"
+        android:animation="@animator/to_purple" />
+
+</animated-vector>

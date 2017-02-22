@@ -33,7 +33,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
-import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,10 +65,9 @@ public class ListActivity extends BaseActivity {
     @BindView(R.id.toolbar) Toolbar toolbar;
     @BindView(R.id.sheet) SheetLayout sheetLayout;
     @BindView(R.id.nav_view) NavigationView navigationView;
-    @BindView(R.id.viewpager) ViewPager viewPager;
+    @BindView(R.id.view_pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.tabs) TabLayout tabLayout;
-    @BindView(R.id.floating_image) AppCompatImageView floatingImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +77,6 @@ public class ListActivity extends BaseActivity {
 
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
-
 
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setHomeButtonEnabled(false); // disable the button
@@ -103,7 +100,7 @@ public class ListActivity extends BaseActivity {
 
             }
         });
-        fab.setVisibility(View.INVISIBLE);
+
 
         fab.setOnClickListener(view -> {
             fab.setImageDrawable(null);
@@ -128,8 +125,6 @@ public class ListActivity extends BaseActivity {
 
         setupDrawerContent(navigationView);
         setupViewPager(viewPager);
-
-        floatingImage.setOnClickListener(v -> startAnimation(floatingImage));
     }
 
     @Override
@@ -189,5 +184,9 @@ public class ListActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         fab.setImageResource(R.drawable.ic_add);
+    }
+
+    public FloatingActionButton getFab(){
+        return fab;
     }
 }

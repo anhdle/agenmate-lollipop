@@ -18,22 +18,17 @@ package com.agenmate.lollipop.list;
 
 
 import android.content.Intent;
-import android.graphics.drawable.Animatable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.addedit.AddEditActivity;
@@ -59,13 +54,14 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
     // TODO disbale loading
     protected TasksAdapter tasksAdapter;
-    protected LinearLayoutManager mLayoutManager;
-    private ListContract.Presenter mPresenter;
+    protected LinearLayoutManager layoutManager;
+    private ListContract.Presenter presenter;
     private Unbinder unbinder;
-
     public ListFragment() {}
 
-    @BindView(R.id.list_view) RecyclerView mRecyclerView;
+    private FloatingActionButton fab;
+
+    @BindView(R.id.list_view) RecyclerView recyclerView;
     @BindView(R.id.swipe) ScrollChildSwipeRefreshLayout swipeRefreshLayout;
 
     /**
@@ -74,23 +70,19 @@ public class ListFragment extends Fragment implements ListContract.View  {
     TaskItemListener taskItemListener = new TaskItemListener() {
         @Override
         public void onTaskClick(Task clickedTask) {
-            mPresenter.openTaskDetails(clickedTask);
+            presenter.openTaskDetails(clickedTask);
         }
 
         @Override
         public void onTaskDelete(Task deletedTask) {
-            mPresenter.deleteTask(deletedTask.getId());
+            presenter.deleteTask(deletedTask.getId());
         }
 
         @Override
-        public void onCompleteTaskClick(Task completedTask) {
-            mPresenter.completeTask(completedTask);
-        }
+        public void onCompleteTaskClick(Task completedTask) { presenter.completeTask(completedTask); }
 
         @Override
-        public void onActivateTaskClick(Task activatedTask) {
-            mPresenter.activateTask(activatedTask);
-        }
+        public void onActivateTaskClick(Task activatedTask) { presenter.activateTask(activatedTask); }
     };
 
     public static ListFragment newInstance() {
@@ -104,28 +96,36 @@ public class ListFragment extends Fragment implements ListContract.View  {
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         rootView.setTag(TAG);
         unbinder = ButterKnife.bind(this, rootView);
+        //swipeRefreshLayout.setEnabled(false); // TODO fix missing tasks on swipe
+        layoutManager = new LinearLayoutManager(getActivity());
+        fab = ((ListActivity)getActivity()).getFab();
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        //int scrollPosition = 0;
-        /*if (mRecyclerView.getLayoutManager() != null) {
-            scrollPosition = ((LinearLayoutManager) mRecyclerView.getLayoutManager()).findLastVisibleItemPosition();
-        }*/
-
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        //mRecyclerView.scrollToPosition(scrollPosition);
-        mRecyclerView.setAdapter(tasksAdapter);
-        //mLayoutManager.setStackFromEnd(true);
-
-
-        mRecyclerView.setItemAnimator(new LandingAnimator());
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(tasksAdapter);
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onRefresh() {
-                //swipeRefreshLayout.setRefreshing(false);
-                mPresenter.loadTasks(false);
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy > 0) {
+                    //if(fab.getVisibility() == View.GONE) fab.setVisibility(View.VISIBLE);
+                    // Scrolling up
+                } else {
+                   // if(fab.getVisibility() == View.VISIBLE) fab.setVisibility(View.GONE);
+                    // Scrolling down
+                }
             }
         });
-        swipeRefreshLayout.setScrollUpChild(mRecyclerView);
+
+
+
+        recyclerView.setItemAnimator(new LandingAnimator());
+        swipeRefreshLayout.setOnRefreshListener(() -> presenter.loadTasks(false));
+        swipeRefreshLayout.setScrollUpChild(recyclerView);
 
         setHasOptionsMenu(true);
 
@@ -136,24 +136,24 @@ public class ListFragment extends Fragment implements ListContract.View  {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        tasksAdapter = new TasksAdapter(new ArrayList<Task>(0), taskItemListener);
+        tasksAdapter = new TasksAdapter(getActivity(), new ArrayList<>(0), taskItemListener);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mPresenter.subscribe();
+        presenter.subscribe();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        mPresenter.unsubscribe();
+        presenter.unsubscribe();
     }
 
     @Override
     public void setPresenter(@NonNull ListContract.Presenter presenter) {
-        mPresenter = checkNotNull(presenter);
+        this.presenter = checkNotNull(presenter);
     }
 
     @Override
@@ -190,7 +190,7 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        mPresenter.result(requestCode, resultCode);
+        presenter.result(requestCode, resultCode);
     }
 
     @Override
@@ -284,28 +284,4 @@ public class ListFragment extends Fragment implements ListContract.View  {
     private void showMessage(String message){
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
-
-    private void setImage(View parent, int imageId) {
-        View view = parent.findViewById(R.id.image);
-        if (imageId > 0 && view instanceof ImageView) {
-            final ImageView imageView = (ImageView) view;
-            imageView.setImageDrawable(ContextCompat.getDrawable(getActivity(), imageId));
-            imageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    startAnimation(imageView);
-                }
-            });
-        }
-
-    }
-
-    private void startAnimation(ImageView imageView) {
-        Drawable drawable = imageView.getDrawable();
-        if (drawable != null && drawable instanceof Animatable) {
-            ((Animatable) drawable).start();
-        }
-    }
-
-
 }

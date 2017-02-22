@@ -33,7 +33,7 @@
         </android.support.design.widget.AppBarLayout>
 
         <android.support.v4.view.ViewPager
-            android:id="@+id/viewpager"
+            android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
@@ -42,25 +42,14 @@
             android:id="@+id/fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|bottom"
-            android:layout_marginBottom="6dp"
-            android:layout_marginRight="6dp"
-
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:elevation="4dp"
             app:borderWidth="0dp"
+            app:layout_anchor="@id/view_pager"
+            app:layout_anchorGravity="end|bottom|right"
             />
 
-        <ImageView
-            android:id="@+id/floating_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/animated_balloon"
-            android:layout_gravity="end|bottom"
-            android:layout_marginBottom="6dp"
-            android:layout_marginRight="6dp"
-            android:elevation="12dp"
-            android:visibility="gone"
-            />
 
         <com.agenmate.lollipop.ui.layout.SheetLayout
             android:id="@+id/sheet"
@@ -68,10 +57,7 @@
             android:layout_height="match_parent"
             android:layout_gravity="bottom|end"
             app:sheet_container_gravity="center"
-            app:sheet_color="@color/md_red_700"
-
-
-            />
+            app:sheet_color="@color/md_red_700"/>
     </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.NavigationView
@@ -83,7 +69,6 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/drawer_view"/>
-
 
 </android.support.v4.widget.DrawerLayout>
 
