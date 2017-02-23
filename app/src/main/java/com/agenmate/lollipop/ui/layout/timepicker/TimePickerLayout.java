@@ -187,25 +187,11 @@ public class TimePickerLayout extends ConstraintLayout {
         });
 
         for (int i = 0; i < 7; i++) {
-            final int index = i;
             Button button = new Button(getContext());
             button.setBackgroundResource(R.drawable.round_button_no_shadow);
             button.setText(daysOfWeek[i]);
             dayButtons[i] = button;
-            dayArcMenu.addItem(button, null
-                    // TODO add extra actions
-                    /*v -> {
-                v.setAlpha(1f);
-                colorButtons[index].setAlpha(1f);
-                if(index != previousDayOfWeek){
-
-                    dayButtons[previousDayOfWeek].setAlpha(0.2f);
-                    previousDayOfWeek = index;
-
-                   // setTime.set(Calendar.DAY_OF_WEEK, previousDayOfWeek + 1);
-                }
-            }*/
-            );
+            dayArcMenu.addItem(button, null);  // TODO add extra actions
         }
 
         dayArcMenu.setOnArcAnimationEndListener(isExpanded -> {
@@ -216,8 +202,6 @@ public class TimePickerLayout extends ConstraintLayout {
                         new Handler().postDelayed(() -> dayButtons[finalI].setAlpha(0.2f), 100 * finalI);
                 } else dayButtons[finalI].setAlpha(1f);
             }
-
-
         });
 
         dayArcMenu.setControlLayoutClickListener(v -> {
@@ -234,7 +218,7 @@ public class TimePickerLayout extends ConstraintLayout {
             }
         });
 
-        resetDate();
+
 
         /*fadeAnimation = new AlphaAnimation(1f, 0.2f);
         fadeAnimation.setDuration(100);
@@ -316,9 +300,7 @@ public class TimePickerLayout extends ConstraintLayout {
     }
 
     public void adjustDaysOfWeek(){
-        Log.v("prevdowin", String.valueOf(previousDayOfWeek));
         dayOfWeek = TimeUtils.getDayOfWeek(year, month, dayOfMonth);
-        Log.v("dowin", String.valueOf(dayOfWeek));
         if(previousDayOfWeek != dayOfWeek){
             dayButtons[previousDayOfWeek].setAlpha(0.2f);
             dayButtons[dayOfWeek].setAlpha(1f);
@@ -349,8 +331,10 @@ public class TimePickerLayout extends ConstraintLayout {
         listener.onTimeChange(getTimeFromPicker());
     }
 
-    public void resetDate(){
-        now = new DateTime();
+    public void resetDate(long dueDate){
+        if(dueDate == 0){
+            now = new DateTime();
+        } else now = new DateTime(dueDate / 1000L);
         year = now.getYear();
         month = now.getMonthOfYear();
         dayOfMonth = now.getDayOfMonth();
@@ -358,6 +342,8 @@ public class TimePickerLayout extends ConstraintLayout {
         previousDayOfWeek = dayOfWeek;
 
         setUIMode(Mode.DATE);
+
+
     }
 
     public void resetTime(){

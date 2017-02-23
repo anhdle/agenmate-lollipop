@@ -38,6 +38,12 @@ public interface AddEditContract {
 
         void setDescription(String description);
 
+        void setPriority(int priority);
+
+        void setColor(int color);
+
+        void setDueDate(long dueDate);
+
         boolean isActive();
 
         void showTaskDeleted();

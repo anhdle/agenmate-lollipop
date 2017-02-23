@@ -26,6 +26,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -96,7 +97,9 @@ public class ListFragment extends Fragment implements ListContract.View  {
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         rootView.setTag(TAG);
         unbinder = ButterKnife.bind(this, rootView);
-        //swipeRefreshLayout.setEnabled(false); // TODO fix missing tasks on swipe
+        swipeRefreshLayout.setEnabled(false); // TODO fix missing tasks on swipe
+        //swipeRefreshLayout.setOnRefreshListener(() -> presenter.loadTasks(false));
+        //swipeRefreshLayout.setScrollUpChild(recyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
         fab = ((ListActivity)getActivity()).getFab();
 
@@ -105,29 +108,26 @@ public class ListFragment extends Fragment implements ListContract.View  {
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE){
+                    fab.show();
+                }
+
                 super.onScrollStateChanged(recyclerView, newState);
             }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0) {
-                    //if(fab.getVisibility() == View.GONE) fab.setVisibility(View.VISIBLE);
-                    // Scrolling up
-                } else {
-                   // if(fab.getVisibility() == View.VISIBLE) fab.setVisibility(View.GONE);
-                    // Scrolling down
+
+                if (dy > 0 ||dy < 0 && fab.isShown()) {
+                    fab.hide();
                 }
             }
         });
 
-
-
         recyclerView.setItemAnimator(new LandingAnimator());
-        swipeRefreshLayout.setOnRefreshListener(() -> presenter.loadTasks(false));
-        swipeRefreshLayout.setScrollUpChild(recyclerView);
 
-        setHasOptionsMenu(true);
+
 
         return rootView;
     }
@@ -137,6 +137,8 @@ public class ListFragment extends Fragment implements ListContract.View  {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         tasksAdapter = new TasksAdapter(getActivity(), new ArrayList<>(0), taskItemListener);
+        setHasOptionsMenu(true);
+
     }
 
     @Override
@@ -184,8 +186,8 @@ public class ListFragment extends Fragment implements ListContract.View  {
     }
 
     @Override
-    public void showTasks(List<Task> tasks) {
-        tasksAdapter.replaceData(tasks);
+    public void showTasks(List<Task> tasks, boolean notify) {
+        tasksAdapter.replaceData(tasks, notify);
     }
 
     @Override
