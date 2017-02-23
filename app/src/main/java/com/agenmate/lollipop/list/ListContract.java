@@ -33,7 +33,7 @@ public interface ListContract {
 
         void setLoadingIndicator(boolean active);
 
-        void showTasks(List<Task> tasks);
+        void showTasks(List<Task> tasks, boolean notify);
 
         void showAddTask();
 

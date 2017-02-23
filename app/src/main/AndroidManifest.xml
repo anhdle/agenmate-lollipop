@@ -34,7 +34,6 @@
         <activity
             android:name=".addedit.AddEditActivity"
             android:windowSoftInputMode="stateHidden|adjustNothing">
-
         </activity>
 
         <receiver android:name=".alarm.AlarmReceiver" />

@@ -84,7 +84,6 @@ public class AddEditActivity extends BaseActivity {
 
         addEditFragment = (AddEditFragment) getSupportFragmentManager().findFragmentById(R.id.content_frame);
         taskId = getIntent().getStringExtra(AddEditFragment.ARGUMENT_EDIT_TASK_ID);
-        Log.v("tagId", String.valueOf(taskId));
 
         if (addEditFragment == null) {
             addEditFragment = AddEditFragment.newInstance();
@@ -122,26 +121,25 @@ public class AddEditActivity extends BaseActivity {
         return EspressoIdlingResource.getIdlingResource();
     }
 
-    private boolean setWhite;
+    //private boolean isWhiteText;
     @SuppressLint("NewApi")
-    public void setBarColor(int color){
+    public void setBarColor(int color, boolean isWhiteText){
         appBar.setBackgroundColor(ContextCompat.getColor(this, colorBarIds[color]));
-        setWhite = color == 0 || color == 5 || color == 6;
-        String htmlColor = setWhite ? "'#ffffff'" : "'#000000'";
+        String htmlColor = isWhiteText ? "'#ffffff'" : "'#000000'";
         actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + htmlColor +">New TODO</font>"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             window.setStatusBarColor(ContextCompat.getColor(this, colorStatusIds[color]));
             final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
-            upArrow.setColorFilter(setWhite ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+            upArrow.setColorFilter(isWhiteText ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
             getSupportActionBar().setHomeAsUpIndicator(upArrow);
         }
-        Log.v("menunull", String.valueOf(menu));
+
         if(menu != null){
             for(int i = 0; i < menu.size(); i++){
                 Drawable drawable = menu.getItem(i).getIcon();
                 if(drawable != null) {
                     drawable.mutate();
-                    drawable.setColorFilter(setWhite ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+                    drawable.setColorFilter(isWhiteText ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
                 }
             }
         }

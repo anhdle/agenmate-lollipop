@@ -36,7 +36,7 @@ public final class Task {
     @NonNull
     private final boolean hasAlarm;
 
-    private final boolean mCompleted;
+    private boolean isCompleted;
 
     /**
      * Use this constructor to create a new active Task.
@@ -88,7 +88,7 @@ public final class Task {
         this.color = color;
         this.dueAt = dueAt;
         this.hasAlarm = hasAlarm;
-        mCompleted = completed;
+        isCompleted = completed;
     }
 
     @NonNull
@@ -98,11 +98,6 @@ public final class Task {
 
     @NonNull
     public String getTitle() {
-        return mTitle;
-    }
-
-    @Nullable
-    public String getTitleForList() {
         return mTitle;
     }
 
@@ -117,11 +112,11 @@ public final class Task {
     }
 
     public boolean isCompleted() {
-        return mCompleted;
+        return isCompleted;
     }
 
     public boolean isActive() {
-        return !mCompleted;
+        return !isCompleted;
     }
 
     public boolean isEmpty() {
@@ -162,4 +157,6 @@ public final class Task {
     public boolean hasAlarm() {
         return hasAlarm;
     }
+
+    public void setCompleted(boolean isCompleted){ this.isCompleted = isCompleted;}
 }

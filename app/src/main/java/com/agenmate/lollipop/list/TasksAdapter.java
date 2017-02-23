@@ -4,12 +4,16 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatCheckBox;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -44,7 +48,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         private final ImageView balloon;
         private final ImageView alarm;
         private final ImageView trash;
+        private final CheckBox active;
         private final FrameLayout balloonContainer;
+        public boolean isPlayed;
 
         public ViewHolder(View view) {
             super(view);
@@ -54,6 +60,7 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
             balloon = (ImageView)view.findViewById(R.id.balloon);
             alarm = (ImageView)view.findViewById(R.id.alarm_button);
             trash = (ImageView)view.findViewById(R.id.delete_button);
+            active = (CheckBox)view.findViewById(R.id.active_button);
             balloonContainer = (FrameLayout)view.findViewById(R.id.balloon_container);
 
         }
@@ -81,6 +88,10 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         public FrameLayout getBalloonContainer() {
             return balloonContainer;
         }
+
+        public CheckBox getActive() {
+            return active;
+        }
     }
 
     public TasksAdapter(Context context, List<Task> tasks, TaskItemListener itemListener) {
@@ -89,9 +100,9 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         this.itemListener = itemListener;
     }
 
-    public void replaceData(List<Task> tasks) {
+    public void replaceData(List<Task> tasks, boolean notify) {
         setList(tasks);
-        notifyDataSetChanged();
+        if(notify) notifyDataSetChanged();
     }
 
     private void setList(List<Task> tasks) {
@@ -117,7 +128,8 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         balloon.setImageResource(balloonIds[task.getColor()]);
         balloon.setLayoutParams(new FrameLayout.LayoutParams(size, size, Gravity.CENTER));
         balloon.setOnClickListener(v -> itemListener.onTaskClick(task));
-        startAnimation(balloon);
+
+
         final ImageView alarm = viewHolder.getAlarm();
         alarm.setVisibility(task.hasAlarm() ? View.VISIBLE : View.GONE);
         alarm.setOnClickListener(v -> {
@@ -125,13 +137,44 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         });
         viewHolder.getTrash().setOnClickListener(v -> itemListener.onTaskDelete(task));
 
-         /*
-        if (!task.isCompleted()) {
-            itemListener.onCompleteTaskClick(task);
-        } else {
-            itemListener.onActivateTaskClick(task);
+        final CheckBox active = viewHolder.getActive();
+        active.setChecked(task.isCompleted());
+        active.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    //task.setCompleted(true);
+                    //tasks.set(position, task);
+                    itemListener.onCompleteTaskClick(task);
+                } else {
+                    //task.setCompleted(false);
+                    //tasks.set(position, task);
+                    itemListener.onActivateTaskClick(task);
+                }
+            }
+        });
+
+    }
+
+    @Override
+    public void onViewRecycled(ViewHolder holder) {
+        super.onViewRecycled(holder);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(ViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.isPlayed = false;
+        //Log.v("detach", String.valueOf(holder.isPlayed));
+    }
+
+    @Override
+    public void onViewAttachedToWindow(ViewHolder holder) {
+        super.onViewAttachedToWindow(holder);
+        if(!holder.isPlayed){
+            startAnimation(holder.getBalloon());
+            holder.isPlayed = true;
         }
-        */
     }
 
     @Override

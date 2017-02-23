@@ -104,11 +104,9 @@ public class TasksRepository implements TasksDataSource {
             mCachedTasks = new LinkedHashMap<>();
         }
 
-        Log.v("loadtask", "get");
         if(mCacheIsDirty){
             return Observable.from(mCachedTasks.values()).toList().doOnCompleted(()-> mCacheIsDirty = false);
         } else {
-            Log.v("loadtask", "s");
             // Query the local storage if available. If not, query the network.
             Observable<List<Task>> localTasks = getAndCacheLocalTasks();
 

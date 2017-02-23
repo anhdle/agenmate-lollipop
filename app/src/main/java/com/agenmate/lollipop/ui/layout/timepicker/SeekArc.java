@@ -376,7 +376,6 @@ public class SeekArc extends View {
 		progress = (progress < 0) ? 0 : progress;
 		progress = progress == 0 ? mMax : progress;
 
-		Log.v("progressupdatesee", String.valueOf(progress));
 		mProgress = progress;
 
 		if (mOnSeekArcChangeListener != null) {

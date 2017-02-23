@@ -135,22 +135,25 @@ final class ListPresenter implements ListContract.Presenter {
         firstLoad = sharedPreferences
                 .getBoolean("firstLoad", true);
 
-        loadTasks(forceUpdate || firstLoad, true);
+        loadTasks(forceUpdate || firstLoad, true, true);
     }
 
 
-
+    private boolean refreshView;
     /**
      * @param forceUpdate   Pass in true to refresh the data in the
      * @param showLoadingUI Pass in true to display a loading icon in the UI
+     * @param refreshView
      */
-    private void loadTasks(final boolean forceUpdate, final boolean showLoadingUI) {
+    private void loadTasks(final boolean forceUpdate, final boolean showLoadingUI, boolean refreshView) {
         if (showLoadingUI) {//TODO turn off indicator loading
             listView.setLoadingIndicator(true);
         }
         if (forceUpdate) {
             mTasksRepository.refreshTasks();
         }
+
+        this.refreshView = refreshView;
 
         EspressoIdlingResource.increment(); // App is busy until further notice
         subscriptions.clear();
@@ -188,9 +191,7 @@ final class ListPresenter implements ListContract.Presenter {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
-                })
-                .subscribe(
-                        this::processTasks,
+                }).subscribe(this::processTasks,
                         throwable -> listView.showLoadingTasksError(),
                         () -> listView.setLoadingIndicator(false));
         subscriptions.add(subscription);
@@ -201,7 +202,8 @@ final class ListPresenter implements ListContract.Presenter {
             processEmptyTasks();
         } else {
             // Show the list of tasks
-            listView.showTasks(tasks);
+            listView.showTasks(tasks, refreshView);
+            refreshView = true;
             // Set the filter label's text.
             showFilterLabel();
         }
@@ -252,9 +254,10 @@ final class ListPresenter implements ListContract.Presenter {
     @Override
     public void completeTask(@NonNull Task completedTask) {
         checkNotNull(completedTask, "completedTask cannot be null!");
+
         mTasksRepository.completeTask(completedTask);
         listView.showTaskMarkedComplete();
-        loadTasks(false, false);
+        loadTasks(false, false, false);
     }
 
     @Override
@@ -262,7 +265,7 @@ final class ListPresenter implements ListContract.Presenter {
         checkNotNull(activeTask, "activeTask cannot be null!");
         mTasksRepository.activateTask(activeTask);
         listView.showTaskMarkedActive();
-        loadTasks(false, false);
+        loadTasks(false, false, false);
     }
 
     @Override
@@ -280,7 +283,7 @@ final class ListPresenter implements ListContract.Presenter {
     public void clearCompletedTasks() {
         mTasksRepository.clearCompletedTasks();
         listView.showCompletedTasksCleared();
-        loadTasks(false, false);
+        loadTasks(false, false, true);
     }
 
     /**

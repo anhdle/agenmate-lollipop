@@ -18,6 +18,7 @@ package com.agenmate.lollipop.addedit;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import com.agenmate.lollipop.alarm.BaseAlarmController;
 import com.agenmate.lollipop.data.Task;
@@ -51,7 +52,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
     private final TasksDataSource mTasksRepository;
 
     @NonNull
-    private final AddEditContract.View mAddTaskView;
+    private final AddEditContract.View addEditView;
 
     @NonNull
     private final BaseSchedulerProvider mSchedulerProvider;
@@ -74,12 +75,12 @@ final class AddEditPresenter implements AddEditContract.Presenter {
     @Inject
     AddEditPresenter(@Nullable String taskId,
                      @NonNull TasksRepository tasksRepository,
-                     @NonNull AddEditContract.View addTaskView,
+                     @NonNull AddEditContract.View addEditView,
                      @NonNull BaseSchedulerProvider schedulerProvider,
                      @NonNull BaseAlarmController alarmController) {
         this.taskId = taskId;
         mTasksRepository = checkNotNull(tasksRepository);
-        mAddTaskView = checkNotNull(addTaskView);
+        this.addEditView = checkNotNull(addEditView);
         mSchedulerProvider = checkNotNull(schedulerProvider);
         this.alarmController = checkNotNull(alarmController);
         mIsDataMissing = true;
@@ -92,13 +93,17 @@ final class AddEditPresenter implements AddEditContract.Presenter {
      */
     @Inject
     void setupListeners() {
-        mAddTaskView.setPresenter(this);
+        addEditView.setPresenter(this);
     }
 
     @Override
     public void subscribe() {
         if (!isNewTask() && mIsDataMissing) {
             populateTask();
+        } else {
+            addEditView.setPriority(0);
+            addEditView.setColor(0);
+            addEditView.setDueDate(0);
         }
     }
 
@@ -110,6 +115,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
 
     @Override
     public void saveTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
+        Log.v("isnewTask", String.valueOf(isNewTask()));
         if (isNewTask()) {
             createTask(title, description, priority, color, dueAt, hasAlarm);
         } else {
@@ -131,16 +137,18 @@ final class AddEditPresenter implements AddEditContract.Presenter {
                 .subscribe(
                         // onNext
                         task -> {
-                            if (mAddTaskView.isActive()) {
-                                mAddTaskView.setTitle(task.getTitle());
-                                mAddTaskView.setDescription(task.getDescription());
-
+                            if (addEditView.isActive()) {
+                                addEditView.setTitle(task.getTitle());
+                                addEditView.setDescription(task.getDescription());
+                                addEditView.setPriority(task.getPriority());
+                                addEditView.setColor(task.getColor());
+                                addEditView.setDueDate(task.getDueAt());
                                 mIsDataMissing = false;
                             }
                         }, // onError
                         __ -> {
-                            if (mAddTaskView.isActive()) {
-                                mAddTaskView.showEmptyTaskError();
+                            if (addEditView.isActive()) {
+                                addEditView.showEmptyTaskError();
                             }
                         }));
     }
@@ -157,10 +165,10 @@ final class AddEditPresenter implements AddEditContract.Presenter {
     private void createTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
         Task newTask = new Task(title, description, priority, color, dueAt, hasAlarm);
         if (newTask.isEmpty()) {
-            mAddTaskView.showEmptyTaskError();
+            addEditView.showEmptyTaskError();
         } else {
             mTasksRepository.saveTask(newTask);
-            mAddTaskView.showTasksList();
+            addEditView.showTasksList();
         }
     }
 
@@ -169,7 +177,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
         mTasksRepository.saveTask(new Task(title, description, priority, color, dueAt, hasAlarm, taskId));
-        mAddTaskView.showTasksList(); // After an edit, go back to the list.
+        addEditView.showTasksList(); // After an edit, go back to the list.
     }
 
     public BaseAlarmController getAlarmController() {
@@ -179,10 +187,10 @@ final class AddEditPresenter implements AddEditContract.Presenter {
     @Override
     public void deleteTask() {
         if (Strings.isNullOrEmpty(taskId)) {
-            mAddTaskView.showMissingTask();
+            addEditView.showMissingTask();
             return;
         }
         mTasksRepository.deleteTask(taskId);
-        mAddTaskView.showTaskDeleted();
+        addEditView.showTaskDeleted();
     }
 }
