@@ -30,7 +30,6 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -85,7 +84,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     private Unbinder unbinder;
     private DateTime setTime;
     private int timeFormat;
-    private String taskId;
 
     @BindViews({ R.id.title_text_view, R.id.title_card_view, R.id.desc_text_view, R.id.desc_card_view, R.id.priority_text_view, R.id.priority_card_view, R.id.color_text_view}) List<View> bottomViews;
 
@@ -106,8 +104,8 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
     private static final ButterKnife.Action<View> ALPHA_APPEAR = (view, index) -> {
         AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-        alphaAnimation.setDuration(300);
-        alphaAnimation.setStartOffset(index * 300);
+        alphaAnimation.setDuration(250);
+        alphaAnimation.setStartOffset(index * 250);
         alphaAnimation.setFillAfter(true);
         view.startAnimation(alphaAnimation);
     };
@@ -195,9 +193,14 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         formatText(priorityText, "<b>P</b>riority");
         formatText(dueDateText, "<b>D</b>ue <b>D</b>ate");
         formatText(dueDateTeller, null);
-        // TODO if db then set diff text for status
         formatText(dueDateStatus, "(Scroll up to set)");
 
+        seekBar.setProgressDrawable(R.drawable.progress_bar);
+        seekBar.setItems(new String[]{"Low", "Medium", "High"});
+        seekBar.setTextIndicatorColor(Color.BLACK);
+        seekBar.setIndicatorColor(ContextCompat.getColor(getActivity(), R.color.md_grey_300));
+        seekBar.setTextSize(14);
+        seekBar.setIndicatorSize(4);
 
         BottomSheetBehavior.from(sheet)
         .setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -238,11 +241,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
             public void onSlide(View bottomSheet, float slideOffset) {}
         });
 
-
-
-
-
-
         /*ViewUtils.waitForLayoutPrepared(seekBar, new ViewUtils.LayoutPreparedListener() {
             @Override
             public void onLayoutPrepared(final View preparedView) {
@@ -252,7 +250,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
 
       /*
-
               Button start_alarm= (Button) root.findViewById(R.id.start_alarm);
         start_alarm.setOnClickListener(v -> {
             setAlarmText("Alarm set");
@@ -282,8 +279,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         cancel.setOnClickListener(v -> {
             setAlarmText("Alarm cancel");
             presenter.getAlarmController().cancelAlarm();
-
-
         });*/
 
 
@@ -306,7 +301,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         }
 
         timeMenu = timePickerLayout.getDayArcMenu();
-
 
         arcMenu.setOnArcAnimationEndListener(isExpanded -> {
             if(isExpanded) onColorArcExpanded();
@@ -345,12 +339,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     @Override
     public void setPriority(int priority) {
         seekBar.setProgress(priority * 50);
-        seekBar.setProgressDrawable(R.drawable.progress_bar);
-        seekBar.setItems(new String[]{"Low", "Medium", "High"});
-        seekBar.setTextIndicatorColor(Color.BLACK);
-        seekBar.setIndicatorColor(ContextCompat.getColor(getActivity(), R.color.md_blue_grey_300));
-        seekBar.setTextSize(14);
-        seekBar.setIndicatorSize(4);
+
     }
 
     @Override
@@ -371,16 +360,25 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
     @Override
     public void setDueDate(long dueDate) {
-        timePickerLayout.resetDate(dueDate);
-        // TODO hide time if not set alarm
+        setTime = timePickerLayout.resetDate(dueDate);
+        setDueDateText(dueDateStatus);
+
+
         timePickerLayout.setOnTimePickerChangeListener(time -> {
-            // TODO check if time need reset here
+            // TODO check if time need to mark change later
             setTime = time;
             setDueDateText(dueDateTeller);
         });
+    }
 
-        // TODO load time first
-        setDueDateText(dueDateTeller);
+    private void setDueDateText(TextView textView){
+        int status = timePickerLayout.getDueDateStatus();
+        if(status != TimePickerLayout.NO_DUE_DATE){
+            timeFormat =  timePickerLayout.isAtMidnight() ?
+                    DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY :
+                    DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_TIME;
+            textView.setText(DateUtils.formatDateTime(getActivity(), setTime, timeFormat));
+        }
     }
 
     @Override
@@ -421,15 +419,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);
     }
 
-    private void setDueDateText(TextView textView){
-        int status = timePickerLayout.getDueDateStatus();
-        if(status != TimePickerLayout.NO_DUE_DATE){
-            timeFormat = status == TimePickerLayout.HAS_TIME ?
-                    DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY | DateUtils.FORMAT_SHOW_TIME :
-                    DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_WEEKDAY;
-            textView.setText(DateUtils.formatDateTime(getActivity(), setTime, timeFormat));
-        }
-    }
+
 
     public void onOptionsCreated(){
         ((AddEditActivity)getActivity()).setBarColor(selectedColor, selectedColor == 0 || selectedColor == 5 || selectedColor == 6);

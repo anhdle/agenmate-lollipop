@@ -17,7 +17,7 @@ import com.agenmate.lollipop.util.FontUtils;
 import com.agenmate.lollipop.util.ViewUtils;
 public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBarChangeListener {
     public static final int         NOT_INITIALIZED_THUMB_POSITION  = -1;
-    private Context                 mContext;
+    private Context context;
     private SeekBar                 mSeekBar;
     private int                     mItemsAmount;
     private int                     mFromProgress;
@@ -41,23 +41,35 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     public SnappingSeekBar(final Context context) {
         super(context);
-        mContext = context;
+        this.context = context;
         initDensity();
         initDefaultValues();
         initViewsAfterLayoutPrepared();
     }
 
+    public SnappingSeekBar(final Context context, final AttributeSet attrs) {
+        super(context, attrs);
+        this.context = context;
+        initDensity();
+        initDrawables();
+        setItemsAmount(3);
+        initIndicatorAttributes();
+        initTextAttributes();
+        initColors();
+        initViews();
+    }
+
     private void initDensity() {
-        mDensity = mContext.getResources().getDisplayMetrics().density;
+        mDensity = context.getResources().getDisplayMetrics().density;
     }
 
     private void initDefaultValues() {
         mProgressDrawableId = R.drawable.progress_bar;
         mIndicatorDrawableId = R.drawable.circle_background;
         mProgressColor = Color.WHITE;
-        mIndicatorColor = Color.WHITE;
+        mIndicatorColor = ContextCompat.getColor(context, R.color.md_blue_grey_300);
         mThumbnailColor = Color.WHITE;
-        mTextIndicatorColor = Color.WHITE;
+        mTextIndicatorColor = Color.BLACK;
         mTextIndicatorTopMargin = 35 * mDensity;
         mTextSize = 12 * mDensity;
         mIndicatorSize = 11.3f * mDensity;
@@ -72,17 +84,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
         });
     }
 
-    public SnappingSeekBar(final Context context, final AttributeSet attrs) {
-        super(context, attrs);
-        mContext = context;
-        initDensity();
-        initDrawables();
-        setItemsAmount(3);
-        initIndicatorAttributes();
-        initTextAttributes();
-        initColors();
-        initViews();
-    }
+
 
 
     private void initDrawables() {
@@ -135,7 +137,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     private void initSeekBar() {
         final LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        mSeekBar = new SeekBar(mContext);
+        mSeekBar = new SeekBar(context);
         mSeekBar.setOnSeekBarChangeListener(this);
         mSeekBar.setLayoutParams(params);
         setDrawablesToSeekBar();
@@ -174,7 +176,7 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
         final int sectionFactor = 100 / (mItemsAmount - 1);
         final float seekBarWidthWithoutThumbOffset = seekBarWidth - thumbnailWidth;
         final LayoutParams indicatorParams = new LayoutParams((int) mIndicatorSize, (int) mIndicatorSize);
-        final View indicator = new View(mContext);
+        final View indicator = new View(context);
         indicator.setBackgroundResource(mIndicatorDrawableId);
         ViewUtils.setColor(indicator.getBackground(), mIndicatorColor);
         indicatorParams.leftMargin = (int) (seekBarWidthWithoutThumbOffset / 100 * index * sectionFactor + thumbnailWidth / 2 - mIndicatorSize / 2);
@@ -193,14 +195,14 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
         final int sectionFactor = 100 / (mItemsAmount - 1);
         final float seekBarWidthWithoutThumbOffset = completeSeekBarWidth - thumbnailWidth;
         final LayoutParams textParams = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        final TextView textIndicator = new TextView(mContext);
+        final TextView textIndicator = new TextView(context);
         final int numberLeftMargin = (int) (seekBarWidthWithoutThumbOffset / 100 * index * sectionFactor + thumbnailWidth / 2);
         textIndicator.setText(mItems[index]);
         textIndicator.setTextSize(mTextSize / mDensity);
         textIndicator.setTextColor(mTextIndicatorColor);
 
         if (Build.VERSION.SDK_INT < 23) {
-            textIndicator.setTextAppearance(mContext, mTextStyleId);
+            textIndicator.setTextAppearance(context, mTextStyleId);
         } else {
             textIndicator.setTextAppearance(mTextStyleId);
         }

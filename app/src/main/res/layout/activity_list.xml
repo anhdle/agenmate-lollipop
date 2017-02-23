@@ -12,6 +12,7 @@
 
         <android.support.design.widget.AppBarLayout
             android:id="@+id/appbar"
+            android:elevation="2dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/md_red_700">
@@ -53,6 +54,7 @@
 
         <com.agenmate.lollipop.ui.layout.SheetLayout
             android:id="@+id/sheet"
+            android:elevation="10dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="bottom|end"

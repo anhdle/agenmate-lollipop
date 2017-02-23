@@ -42,7 +42,7 @@ public class TimePickerLayout extends ConstraintLayout {
     private Animation fadeAnimation;
     public static final int NO_DUE_DATE = 0;
     public static final int HAS_DUE_DATE = 1;
-    public static final int HAS_TIME = 2;
+
 
     private DateTime now;
     @BindView(R.id.container_hour) FrameLayout hourContainer;
@@ -58,8 +58,6 @@ public class TimePickerLayout extends ConstraintLayout {
     @BindView(R.id.date_picker_year_next) Button next;
     @BindView(R.id.date_picker_year_prev) Button prev;
     @BindView(R.id.arc_menu_time) ArcMenu dayArcMenu;
-
-
 
     public TimePickerLayout(Context context) {
         super(context);
@@ -101,7 +99,6 @@ public class TimePickerLayout extends ConstraintLayout {
                 } else {
                     if(hour != progress){
                         hour = progress;
-                        //adjustDay();
                         listener.onTimeChange(getTimeFromPicker());
                     }
                 }
@@ -206,27 +203,43 @@ public class TimePickerLayout extends ConstraintLayout {
 
         dayArcMenu.setControlLayoutClickListener(v -> {
             if(mode == Mode.DATE){
-                if(dueDateStatus == HAS_DUE_DATE){
-                    dueDateStatus = HAS_TIME;
-                    resetTime();
-
-                } else { // TODO if already has time
-                    setUIMode(Mode.TIME);
-                }
+              setUIMode(Mode.TIME);
             } else {
                 setUIMode(Mode.DATE);
             }
         });
 
-
-
-        /*fadeAnimation = new AlphaAnimation(1f, 0.2f);
-        fadeAnimation.setDuration(100);
-        fadeAnimation.setInterpolator(new AccelerateInterpolator());
-        fadeAnimation.setFillAfter(true);*/
     }
 
     private Button [] dayButtons;
+
+    public DateTime resetDate(long dueDate){
+        if(dueDate == 0){
+            now = new DateTime();
+            setDueDateStatus(NO_DUE_DATE);
+        } else {
+            setDueDateStatus(HAS_DUE_DATE);
+            now = new DateTime(dueDate / 1000L);
+            // TODO what if time is 0:00
+            if(now.getHourOfDay() == 0 && now.getMinuteOfHour() == 0){
+
+            }
+        }
+        year = now.getYear();
+        month = now.getMonthOfYear();
+        dayOfMonth = now.getDayOfMonth();
+        dayOfWeek = now.getDayOfWeek() % 7;
+        previousDayOfWeek = dayOfWeek;
+        hour = now.getHourOfDay();
+        isAM = hour < 12;
+        hour = isAM ? hour : hour - 12;
+        hour = hour == 0 ? 12 : hour;
+        minute = now.getMinuteOfHour(); // TODO allow time + 1
+
+        setUIMode(Mode.DATE);
+
+        return now;
+    }
 
 
     public void setUIMode(Mode mode){
@@ -331,32 +344,7 @@ public class TimePickerLayout extends ConstraintLayout {
         listener.onTimeChange(getTimeFromPicker());
     }
 
-    public void resetDate(long dueDate){
-        if(dueDate == 0){
-            now = new DateTime();
-        } else now = new DateTime(dueDate / 1000L);
-        year = now.getYear();
-        month = now.getMonthOfYear();
-        dayOfMonth = now.getDayOfMonth();
-        dayOfWeek = now.getDayOfWeek() % 7;
-        previousDayOfWeek = dayOfWeek;
 
-        setUIMode(Mode.DATE);
-
-
-    }
-
-    public void resetTime(){
-        now = new DateTime();
-        hour = now.getHourOfDay();
-        isAM = hour < 12;
-        hour = isAM ? hour : hour - 12;
-        hour = hour == 0 ? 12 : hour;
-        minute = now.getMinuteOfHour(); // TODO allow time + 1
-
-        setUIMode(Mode.TIME);
-        listener.onTimeChange(getTimeFromPicker());
-    }
 
     private int convert12To24(){
         int hourIn24;
@@ -375,6 +363,10 @@ public class TimePickerLayout extends ConstraintLayout {
 
     public void toggleAlarm(){
         dueDateStatus = dueDateStatus == 1 ? 2 : 1;
+    }
+
+    public boolean isAtMidnight(){
+        return hour == 12 && minute == 0 && isAM;
     }
 
 }
