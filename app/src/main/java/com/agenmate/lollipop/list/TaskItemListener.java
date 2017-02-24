@@ -1,5 +1,7 @@
 package com.agenmate.lollipop.list;
 
+import android.widget.ImageView;
+
 import com.agenmate.lollipop.data.Task;
 
 /**
@@ -8,7 +10,7 @@ import com.agenmate.lollipop.data.Task;
 
 public interface TaskItemListener {
 
-    void onTaskClick(Task clickedTask);
+    void onTaskClick(Task clickedTask, ImageView view, int color);
 
     void onTaskDelete(Task deletedTask);
 

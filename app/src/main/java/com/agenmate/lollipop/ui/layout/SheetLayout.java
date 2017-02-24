@@ -54,7 +54,7 @@ public class SheetLayout extends FrameLayout {
     };
 
     private LinearLayout mFabExpandLayout;
-    private ImageView mFab;
+    private ImageView view;
 
     private int animationDuration;
     private int mFabSize;
@@ -135,7 +135,7 @@ public class SheetLayout extends FrameLayout {
     }
 
     public void setFab(ImageView imageView) {
-        mFab = imageView;
+        view = imageView;
     }
 
     @Override public void addView(@NonNull View child) {
@@ -197,15 +197,15 @@ public class SheetLayout extends FrameLayout {
             return;
         }
 
-        MarginLayoutParams lp = (MarginLayoutParams) mFab.getLayoutParams();
-        float dy = mFab.getHeight() + lp.bottomMargin;
-        if (mFab.getTranslationY() != dy) {
+        MarginLayoutParams lp = (MarginLayoutParams) view.getLayoutParams();
+        float dy = view.getHeight() + lp.bottomMargin;
+        if (view.getTranslationY() != dy) {
             return;
         }
 
         mAnimatingFab = true;
-        mFab.setVisibility(View.VISIBLE);
-        mFab.animate()
+        view.setVisibility(View.VISIBLE);
+        view.animate()
                 .setStartDelay(0)
                 .setDuration(200)
                 .setInterpolator(new FastOutLinearInInterpolator())
@@ -229,22 +229,22 @@ public class SheetLayout extends FrameLayout {
             return;
         }
 
-        MarginLayoutParams lp = (MarginLayoutParams) mFab.getLayoutParams();
-        if (mFab.getTranslationY() != 0f) {
+        MarginLayoutParams lp = (MarginLayoutParams) view.getLayoutParams();
+        if (view.getTranslationY() != 0f) {
             return;
         }
 
         mAnimatingFab = true;
-        mFab.animate()
+        view.animate()
                 .setStartDelay(0)
                 .setDuration(200)
                 .setInterpolator(new FastOutLinearInInterpolator())
-                .translationY(mFab.getHeight() + lp.bottomMargin)
+                .translationY(view.getHeight() + lp.bottomMargin)
                 .setListener(new AnimatorListenerAdapter() {
                     @Override public void onAnimationEnd(final Animator animation) {
                         super.onAnimationEnd(animation);
                         mAnimatingFab = false;
-                        mFab.setVisibility(View.INVISIBLE);
+                        view.setVisibility(View.INVISIBLE);
                     }
                 })
                 .start();
@@ -263,8 +263,8 @@ public class SheetLayout extends FrameLayout {
         mFabExpandLayout.setAlpha(0f);
         mFabExpandLayout.setVisibility(View.VISIBLE);
 
-        int x = (int)centerX(mFab);
-        int y = (int)centerY(mFab);
+        int x = (int)centerX(view);
+        int y = (int)centerY(view);
 
         float startRadius = getFabSizePx() / 2;
         float endRadius = calculateStartRadius(x, y);
@@ -273,11 +273,11 @@ public class SheetLayout extends FrameLayout {
             float dx = getDx();
             float dy = getDy();
 
-            fabSlideXAnim = ObjectAnimator.ofPropertyValuesHolder(mFab, PropertyValuesHolder.ofFloat(View.TRANSLATION_X, 0f, dx));
+            fabSlideXAnim = ObjectAnimator.ofPropertyValuesHolder(view, PropertyValuesHolder.ofFloat(View.TRANSLATION_X, 0f, dx));
             fabSlideXAnim.setDuration(animationDuration);
             fabSlideXAnim.setInterpolator(new AccelerateInterpolator(1.0f));
 
-            fabSlideYAnim = ObjectAnimator.ofPropertyValuesHolder(mFab, PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 0f, dy));
+            fabSlideYAnim = ObjectAnimator.ofPropertyValuesHolder(view, PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, 0f, dy));
             fabSlideYAnim.setDuration(animationDuration);
             fabSlideYAnim.setInterpolator(new DecelerateInterpolator(0.8f));
         }
@@ -289,9 +289,9 @@ public class SheetLayout extends FrameLayout {
                 fabSlideYAnim.addListener(new AnimatorListenerAdapter() {
                     @Override public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-                        mFab.setVisibility(View.INVISIBLE);
-                        mFab.setTranslationX(0f);
-                        mFab.setTranslationY(0f);
+                        view.setVisibility(View.INVISIBLE);
+                        view.setTranslationX(0f);
+                        view.setTranslationY(0f);
 
                         // Play sheet expand animation asheeter slide animations finish.
                         sheetExpandAnim.start();
@@ -310,9 +310,9 @@ public class SheetLayout extends FrameLayout {
                 fabSlideYAnim.addListener(new AnimatorListenerAdapter() {
                     @Override public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
-                        mFab.setVisibility(View.INVISIBLE);
-                        mFab.setTranslationX(0f);
-                        mFab.setTranslationY(0f);
+                        view.setVisibility(View.INVISIBLE);
+                        view.setTranslationX(0f);
+                        view.setTranslationY(0f);
                     }
                 });
                 AnimatorSet animSet = new AnimatorSet();
@@ -331,14 +331,16 @@ public class SheetLayout extends FrameLayout {
             @Override
             public void onAnimationStart(Animator animation) {
                 mFabExpandLayout.setAlpha(1f);
-                mFab.setVisibility(INVISIBLE);
+                view.setVisibility(INVISIBLE);
+                if (listener != null)
+                    listener.onExpandAnimationStart();
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 mAnimatingFab = false;
-                if (mListener != null)
-                    mListener.onFabAnimationEnd();
+                if (listener != null)
+                    listener.onExpandAnimationEnd();
             }
 
             @Override
@@ -358,14 +360,16 @@ public class SheetLayout extends FrameLayout {
             @Override public void onAnimationStart(Animator animation) {
                 super.onAnimationStart(animation);
                 mFabExpandLayout.setAlpha(1f);
-                mFab.setVisibility(INVISIBLE);
+                view.setVisibility(INVISIBLE);
+                if (listener != null)
+                    listener.onExpandAnimationStart();
             }
 
             @Override public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
                 mAnimatingFab = false;
-                if (mListener != null)
-                    mListener.onFabAnimationEnd();
+                if (listener != null)
+                    listener.onExpandAnimationEnd();
             }
         });
     }
@@ -379,10 +383,10 @@ public class SheetLayout extends FrameLayout {
 
         mFabType = FAB_CIRCLE;
         mAnimatingFab = true;
-        mFab.setAlpha(0f);
+        view.setAlpha(0f);
 
-        int x = (int) centerX(mFab);
-        int y = (int) centerY(mFab);
+        int x = (int) centerX(view);
+        int y = (int) centerY(view);
         float endRadius = getFabSizePx() / 2;
         float startRadius = (float) Math.hypot(Math.max(x, mFabExpandLayout.getWidth() - x),
                 Math.max(y, mFabExpandLayout.getHeight() - y));
@@ -391,18 +395,18 @@ public class SheetLayout extends FrameLayout {
         if(currentMode != FULL){
             dx = getDx();
             dy = getDy();
-            mFab.setTranslationX(dx);
-            mFab.setTranslationY(dy);
+            view.setTranslationX(dx);
+            view.setTranslationY(dy);
         }
 
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             if(currentMode != FULL){
-                fabSlideXAnim = ObjectAnimator.ofPropertyValuesHolder(mFab, PropertyValuesHolder.ofFloat(View.TRANSLATION_X, dx, 0f));
+                fabSlideXAnim = ObjectAnimator.ofPropertyValuesHolder(view, PropertyValuesHolder.ofFloat(View.TRANSLATION_X, dx, 0f));
                 fabSlideXAnim.setDuration(animationDuration);
                 fabSlideXAnim.setInterpolator(new DecelerateInterpolator(0.8f));
 
-                fabSlideYAnim = ObjectAnimator.ofPropertyValuesHolder(mFab, PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, dy, 0f));
+                fabSlideYAnim = ObjectAnimator.ofPropertyValuesHolder(view, PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, dy, 0f));
                 fabSlideYAnim.setDuration(animationDuration);
                 fabSlideYAnim.setInterpolator(new AccelerateInterpolator(1.0f));
 
@@ -420,12 +424,12 @@ public class SheetLayout extends FrameLayout {
             sheetContractAnim.start();
         } else {
             if(currentMode != FULL){
-                fabSlideXAnim = ObjectAnimator.ofPropertyValuesHolder(mFab, PropertyValuesHolder.ofFloat(View.TRANSLATION_X, dx, 0f));
+                fabSlideXAnim = ObjectAnimator.ofPropertyValuesHolder(view, PropertyValuesHolder.ofFloat(View.TRANSLATION_X, dx, 0f));
                 fabSlideXAnim.setDuration(animationDuration);
                 fabSlideXAnim.setInterpolator(new DecelerateInterpolator(0.8f));
                 fabSlideXAnim.setStartDelay(animationDuration);
 
-                fabSlideYAnim = ObjectAnimator.ofPropertyValuesHolder(mFab, PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, dy, 0f));
+                fabSlideYAnim = ObjectAnimator.ofPropertyValuesHolder(view, PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, dy, 0f));
                 fabSlideYAnim.setDuration(animationDuration);
                 fabSlideYAnim.setInterpolator(new AccelerateInterpolator(1.0f));
                 fabSlideYAnim.setStartDelay(animationDuration);
@@ -457,18 +461,24 @@ public class SheetLayout extends FrameLayout {
         sheetContractAnim.setDuration(animationDuration);
         sheetContractAnim.addListener(new Animator.AnimatorListener() {
             @Override
-            public void onAnimationStart(Animator animation) {}
+            public void onAnimationStart(Animator animation) {
+                if (listener != null)
+                    listener.onContractAnimationStart();
+            }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                mFab.setAlpha(1f);
-                mFab.setVisibility(VISIBLE);
+                view.setAlpha(1f);
+                view.setVisibility(VISIBLE);
                 mFabExpandLayout.setAlpha(0f);
                 if(currentMode != FULL){
                     AnimatorSet animSet = new AnimatorSet();
                     animSet.playTogether(fabSlideXAnim, fabSlideYAnim);
                     animSet.start();
                 }
+
+                if (listener != null)
+                    listener.onContractAnimationEnd();
             }
 
             @Override
@@ -490,9 +500,11 @@ public class SheetLayout extends FrameLayout {
         sheetContractAnim.addListener(new AnimatorListenerAdapter() {
             @Override public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                mFab.setAlpha(1f);
-                mFab.setVisibility(VISIBLE);
+                view.setAlpha(1f);
+                view.setVisibility(VISIBLE);
                 mFabExpandLayout.setAlpha(0f);
+                if (listener != null)
+                    listener.onContractAnimationEnd();
             }
         });
     }
@@ -505,15 +517,15 @@ public class SheetLayout extends FrameLayout {
 
     private float getDx(){
         return currentMode == FULL
-                ? centerX(mFabExpandLayout) + mFab.getWidth() - centerX(mFab)
-                : centerX(mFabExpandLayout) + getFabSizePx() - centerX(mFab);
+                ? centerX(mFabExpandLayout) + view.getWidth() - centerX(view)
+                : centerX(mFabExpandLayout) + getFabSizePx() - centerX(view);
     }
     private float getDy(){
         return currentMode == FULL
                 ? centerY(mFabExpandLayout) / 20
                 :getRelativeTop(mFabExpandLayout)
-                -getRelativeTop(mFab)
-                - (mFab.getHeight() - getFabSizePx()) / 2;
+                -getRelativeTop(view)
+                - (view.getHeight() - getFabSizePx()) / 2;
     }
 
     public int getRelativeTop(View myView) {
@@ -524,14 +536,17 @@ public class SheetLayout extends FrameLayout {
         }
     }
 
-    public interface OnFabAnimationEndListener {
-        void onFabAnimationEnd();
+    public interface OnAnimationListener {
+        void onContractAnimationStart();
+        void onContractAnimationEnd();
+        void onExpandAnimationEnd();
+        void onExpandAnimationStart();
     }
 
-    OnFabAnimationEndListener mListener;
+    OnAnimationListener listener;
 
-    public void setFabAnimationEndListener(OnFabAnimationEndListener eventListener) {
-        mListener = eventListener;
+    public void setFabAnimationEndListener(OnAnimationListener eventListener) {
+        listener = eventListener;
     }
 
     public float centerX(View view) {

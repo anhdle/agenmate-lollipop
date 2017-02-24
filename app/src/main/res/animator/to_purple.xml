@@ -21,5 +21,5 @@
         android:duration="800"
         android:propertyName="fillColor"
         android:valueFrom="@color/md_white_1000"
-        android:valueTo="@color/md_purple_700"/>
+        android:valueTo="@color/md_deep_purple_700"/>
 </set>

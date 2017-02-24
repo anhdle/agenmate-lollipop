@@ -127,7 +127,7 @@ public class ArcMenu extends RelativeLayout {
                 animation.setAnimationListener(new AnimationListener() {
 
                     @Override
-                    public void onAnimationStart(Animation animation) {
+                    public void onExpandAnimationStart(Animation animation) {
 
                     }
 
@@ -137,7 +137,7 @@ public class ArcMenu extends RelativeLayout {
                     }
 
                     @Override
-                    public void onAnimationEnd(Animation animation) {
+                    public void onExpandAnimationEnd(Animation animation) {
                         postDelayed(new Runnable() {
 
                             @Override

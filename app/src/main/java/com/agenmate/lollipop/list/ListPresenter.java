@@ -20,7 +20,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.agenmate.lollipop.addedit.AddEditActivity;
 import com.agenmate.lollipop.data.Task;
@@ -162,7 +161,6 @@ final class ListPresenter implements ListContract.Presenter {
                 .flatMap(new Func1<List<Task>, Observable<Task>>() {
                     @Override
                     public Observable<Task> call(List<Task> tasks) {
-                        Log.v("tasksize", String.valueOf(tasks.size()));
                         return Observable.from(tasks);
                     }
                 })

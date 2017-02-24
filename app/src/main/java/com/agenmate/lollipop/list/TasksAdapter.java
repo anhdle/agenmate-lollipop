@@ -136,9 +136,11 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         formatText(viewHolder.getPriorityText(), getPriorityText(priority), Color.WHITE, priority);
         final ImageView balloon = viewHolder.getBalloon();
         int size = ScreenUtils.dpToPx(context, priority * 20 + 40);
-        balloon.setImageResource(balloonIds[task.getColor()]);
+        int color = task.getColor();
+
         balloon.setLayoutParams(new FrameLayout.LayoutParams(size, size, Gravity.CENTER));
-        balloon.setOnClickListener(v -> itemListener.onTaskClick(task));
+        balloon.setOnClickListener(v -> itemListener.onTaskClick(task, balloon, color));
+
 
         final ImageView alarm = viewHolder.getAlarm();
         alarm.setVisibility(task.hasAlarm() ? View.VISIBLE : View.GONE);
@@ -149,11 +151,15 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
 
         final CheckBox active = viewHolder.getActive();
         active.setChecked(task.isCompleted());
+        balloon.setImageResource(task.isCompleted() ? R.drawable.disable_balloon : balloonIds[color]);
         active.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 itemListener.onCompleteTaskClick(task);
+                balloon.setImageResource(R.drawable.disable_balloon);
             } else {
                 itemListener.onActivateTaskClick(task);
+                balloon.setImageResource(balloonIds[color]);
+                startAnimation(balloon);
             }
         });
 

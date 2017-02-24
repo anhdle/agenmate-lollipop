@@ -74,7 +74,7 @@ public class ListActivity extends BaseActivity {
      //   enterFromBottomAnimation();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-
+        enterFromBottomAnimation();
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
@@ -93,21 +93,7 @@ public class ListActivity extends BaseActivity {
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);*/
 
         sheetLayout.setFab(fab);
-        sheetLayout.setFabAnimationEndListener(new SheetLayout.OnFabAnimationEndListener() {
-            @Override
-            public void onFabAnimationEnd() {
-                orderedFragment.showAddTask();
-
-            }
-        });
-
-
-        fab.setOnClickListener(view -> {
-            fab.setImageDrawable(null);
-            sheetLayout.expandFab();
-        });
         tabLayout.setupWithViewPager(viewPager);
-
         orderedFragment = ListFragment.newInstance();
 
         DaggerListComponent.builder()
@@ -189,4 +175,6 @@ public class ListActivity extends BaseActivity {
     public FloatingActionButton getFab(){
         return fab;
     }
+
+    public SheetLayout getSheetLayout(){return sheetLayout;}
 }

@@ -24,17 +24,19 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.addedit.AddEditActivity;
 import com.agenmate.lollipop.addedit.AddEditFragment;
 import com.agenmate.lollipop.data.Task;
+import com.agenmate.lollipop.ui.layout.SheetLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,17 +63,44 @@ public class ListFragment extends Fragment implements ListContract.View  {
     public ListFragment() {}
 
     private FloatingActionButton fab;
+    private SheetLayout sheetLayout;
+
+    private int[] colorIds = {R.color.md_red_700, R.color.md_orange_700, R.color.md_yellow_700, R.color.md_green_700, R.color.md_blue_700, R.color.md_indigo_700, R.color.md_deep_purple_700};
+
 
     @BindView(R.id.list_view) RecyclerView recyclerView;
     @BindView(R.id.swipe) ScrollChildSwipeRefreshLayout swipeRefreshLayout;
 
-    /**
-     * Listener for clicks on tasks in the ListView.
-     */
     TaskItemListener taskItemListener = new TaskItemListener() {
         @Override
-        public void onTaskClick(Task clickedTask) {
-            presenter.openTaskDetails(clickedTask);
+        public void onTaskClick(Task clickedTask, ImageView view, int color) {
+
+            sheetLayout.setColor(ContextCompat.getColor(getActivity(), colorIds[color]));
+            sheetLayout.setFab(view);
+            sheetLayout.setFabAnimationEndListener(new SheetLayout.OnAnimationListener() {
+                @Override
+                public void onContractAnimationStart() {
+
+                }
+
+                @Override
+                public void onContractAnimationEnd() {
+                    ((ListActivity)getActivity()).setStatusBarColor(0);
+                }
+
+                @Override
+                public void onExpandAnimationEnd() {
+                    presenter.openTaskDetails(clickedTask);
+                }
+
+                @Override
+                public void onExpandAnimationStart() {
+                    ((ListActivity)getActivity()).setStatusBarColor(color);
+                }
+            });
+
+            sheetLayout.expandFab();
+
         }
 
         @Override
@@ -102,6 +131,35 @@ public class ListFragment extends Fragment implements ListContract.View  {
         //swipeRefreshLayout.setScrollUpChild(recyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
         fab = ((ListActivity)getActivity()).getFab();
+        sheetLayout = ((ListActivity)getActivity()).getSheetLayout();
+
+        fab.setOnClickListener(view -> {
+            sheetLayout.setColor(ContextCompat.getColor(getActivity(), colorIds[0]));
+            sheetLayout.setFab(fab);
+            sheetLayout.setFabAnimationEndListener(new SheetLayout.OnAnimationListener() {
+                @Override
+                public void onContractAnimationStart() {
+
+                }
+
+                @Override
+                public void onContractAnimationEnd() {
+
+                }
+
+                @Override
+                public void onExpandAnimationEnd() {
+                    showAddTask();
+                }
+
+                @Override
+                public void onExpandAnimationStart() {
+
+                }
+            });
+            fab.setImageDrawable(null);
+            sheetLayout.expandFab();
+        });
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(tasksAdapter);
@@ -127,8 +185,6 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
         recyclerView.setItemAnimator(new LandingAnimator());
 
-
-
         return rootView;
     }
 
@@ -138,7 +194,6 @@ public class ListFragment extends Fragment implements ListContract.View  {
         super.onCreate(savedInstanceState);
         tasksAdapter = new TasksAdapter(getActivity(), new ArrayList<>(0), taskItemListener);
         setHasOptionsMenu(true);
-
     }
 
     @Override

@@ -21,7 +21,6 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-
                 app:layout_scrollFlags="scroll|enterAlways|snap" />
 
             <android.support.design.widget.TabLayout
@@ -50,7 +49,6 @@
             app:layout_anchor="@id/view_pager"
             app:layout_anchorGravity="end|bottom|right"
             />
-
 
         <com.agenmate.lollipop.ui.layout.SheetLayout
             android:id="@+id/sheet"

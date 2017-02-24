@@ -20,7 +20,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.VisibleForTesting;
 import android.support.design.widget.AppBarLayout;
@@ -28,12 +27,9 @@ import android.support.test.espresso.IdlingResource;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.alarm.BaseAlarmController;
@@ -57,27 +53,25 @@ public class AddEditActivity extends BaseActivity {
     public static final int REQUEST_EDIT_TASK = 2;
     private AddEditFragment addEditFragment;
     private Menu menu;
+    private MenuItem alarmIcon;
+    private String taskId;
+
+    private int[] colorBarIds = {R.color.md_red_700, R.color.md_orange_700, R.color.md_yellow_700, R.color.md_green_700, R.color.md_blue_700, R.color.md_indigo_700, R.color.md_deep_purple_700};
 
     @Inject AddEditPresenter mAddEditTasksPresenter;
     @Inject BaseAlarmController alarmController;
     @BindView(R.id.appbar) AppBarLayout appBar;
     @BindView(R.id.toolbar) Toolbar toolbar;
     private ActionBar actionBar;
-    private String taskId;
-
-    private int[] colorBarIds = {R.color.md_red_700, R.color.md_orange_700, R.color.md_yellow_700, R.color.md_green_700, R.color.md_blue_700, R.color.md_indigo_700, R.color.md_deep_purple_700};
-    private int[] colorStatusIds = {R.color.md_red_900, R.color.md_orange_900, R.color.md_yellow_900, R.color.md_green_900, R.color.md_blue_900, R.color.md_indigo_900, R.color.md_deep_purple_900};
-
-    private Window window;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
-
         // Set up the toolbar.
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
+        enterFromBottomAnimation();
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
@@ -89,21 +83,12 @@ public class AddEditActivity extends BaseActivity {
             addEditFragment = AddEditFragment.newInstance();
 
             if (getIntent().hasExtra(AddEditFragment.ARGUMENT_EDIT_TASK_ID)) {
-                actionBar.setTitle(R.string.edit_task);
                 Bundle bundle = new Bundle();
                 bundle.putString(AddEditFragment.ARGUMENT_EDIT_TASK_ID, taskId);
                 addEditFragment.setArguments(bundle);
-            } else {
-                actionBar.setTitle(R.string.add_task);
             }
 
             ActivityUtils.addFragmentToActivity(getSupportFragmentManager(), addEditFragment, R.id.content_frame);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window = getWindow();
-            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         }
 
 
@@ -126,13 +111,12 @@ public class AddEditActivity extends BaseActivity {
     public void setBarColor(int color, boolean isWhiteText){
         appBar.setBackgroundColor(ContextCompat.getColor(this, colorBarIds[color]));
         String htmlColor = isWhiteText ? "'#ffffff'" : "'#000000'";
-        actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + htmlColor +">New TODO</font>"));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            window.setStatusBarColor(ContextCompat.getColor(this, colorStatusIds[color]));
-            final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
-            upArrow.setColorFilter(isWhiteText ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
-            getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        }
+        String title = taskId == null ? "New Task" : "Edit Task";
+        actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + htmlColor +">" + title + "</font>"));
+        final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+        upArrow.setColorFilter(isWhiteText ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
+        getSupportActionBar().setHomeAsUpIndicator(upArrow);
+        setStatusBarColor(color);
 
         if(menu != null){
             for(int i = 0; i < menu.size(); i++){
@@ -146,9 +130,6 @@ public class AddEditActivity extends BaseActivity {
 
 
     }
-
-    private MenuItem alarmIcon;
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
