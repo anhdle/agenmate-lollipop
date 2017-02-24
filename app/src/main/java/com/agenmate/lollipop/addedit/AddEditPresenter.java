@@ -113,11 +113,11 @@ final class AddEditPresenter implements AddEditContract.Presenter {
 
 
     @Override
-    public void saveTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
+    public void saveTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarmc, boolean isCompleted) {
         if (isNewTask()) {
-            createTask(title, description, priority, color, dueAt, hasAlarm);
+            createTask(title, description, priority, color, dueAt, hasAlarmc);
         } else {
-            updateTask(title, description, priority, color, dueAt, hasAlarm);
+            updateTask(title, description, priority, color, dueAt, hasAlarmc, isCompleted);
         }
     }
 
@@ -135,17 +135,18 @@ final class AddEditPresenter implements AddEditContract.Presenter {
                 .subscribe(
                         // onNext
                         task -> {
-                            if (addEditView.isActive()) {
-                                addEditView.setTitle(task.getTitle());
+                            if (addEditView.isAdded()) {
+                                addEditView.setTitle(task.getTitle()); // TODO
                                 addEditView.setDescription(task.getDescription());
                                 addEditView.setPriority(task.getPriority());
                                 addEditView.setColor(task.getColor());
                                 addEditView.setDueDate(task.getDueAt());
+                                addEditView.setCompleted(task.isCompleted());
                                 mIsDataMissing = false;
                             }
                         }, // onError
                         __ -> {
-                            if (addEditView.isActive()) {
+                            if (addEditView.isAdded()) {
                                 addEditView.showEmptyTaskError();
                             }
                         }));
@@ -170,11 +171,13 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         }
     }
 
-    private void updateTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
+    private void updateTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm, boolean isCompleted) {
         if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        tasksRepository.saveTask(new Task(title, description, priority, color, dueAt, hasAlarm, taskId));
+        Task task = new Task(title, description, priority, color, dueAt, hasAlarm, taskId);
+        task.setCompleted(isCompleted);
+        tasksRepository.saveTask(task);
         addEditView.showTasksList(color);
     }
 

@@ -97,7 +97,7 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
                 @Override
                 public void onContractAnimationEnd() {
-
+                    ((ListActivity)getActivity()).setStatusBarColor(0);
                 }
 
                 @Override

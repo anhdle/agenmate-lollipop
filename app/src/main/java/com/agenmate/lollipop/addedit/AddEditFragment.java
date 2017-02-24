@@ -79,6 +79,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     private int timeFormat;
     private int previousState = BottomSheetBehavior.STATE_COLLAPSED;
     private boolean hasAlarm;
+    private boolean isCompleted;
 
     @BindViews({ R.id.title_text_view, R.id.title_card_view, R.id.desc_text_view, R.id.desc_card_view, R.id.priority_text_view, R.id.priority_card_view, R.id.color_text_view}) List<View> bottomViews;
 
@@ -330,6 +331,11 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         });
     }
 
+    @Override
+    public void setCompleted(boolean isCompleted) {
+        this.isCompleted = isCompleted;
+    }
+
     private void setDueDateText(TextView textView){
         int status = timePickerLayout.getDueDateStatus();
         if(status != TimePickerLayout.NO_DUE_DATE){
@@ -340,10 +346,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         }
     }
 
-    @Override
-    public boolean isActive() {
-        return isAdded();
-    }
+
 
     @Override
     public void showTaskDeleted() {
@@ -406,7 +409,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
                     return true;
                 }
 
-                presenter.saveTask(title, description, priority, selectedColor, dueAt, hasAlarm);
+                presenter.saveTask(title, description, priority, selectedColor, dueAt, hasAlarm, isCompleted);
 
                 return true;
             case R.id.action_alarm:

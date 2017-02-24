@@ -43,14 +43,16 @@ public interface AddEditContract {
 
         void setDueDate(long dueDate);
 
-        boolean isActive();
+        void setCompleted(boolean isCompleted);
+
+        boolean isAdded();
 
         void showTaskDeleted();
     }
 
     interface Presenter extends BasePresenter {
 
-        void saveTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm);
+        void saveTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarmc, boolean isCompleted);
 
         void populateTask();
 

@@ -22,6 +22,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.agenmate.lollipop.data.Task;
 import com.agenmate.lollipop.data.source.TasksDataSource;
@@ -124,6 +125,7 @@ public class TasksLocalDataSource implements TasksDataSource {
         values.put(TaskEntry.COLUMN_NAME_DUE_AT, task.getDueAt());
         values.put(TaskEntry.COLUMN_NAME_HAS_ALARM, task.hasAlarm());
         values.put(TaskEntry.COLUMN_NAME_COMPLETED, task.isCompleted());
+        Log.v("tasksaved", String.valueOf(task.getTitle() + " " + task.isCompleted()));
         mDatabaseHelper.insert(TaskEntry.TABLE_NAME, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 

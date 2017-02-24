@@ -6,6 +6,7 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -149,7 +150,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
             // TODO toggle alarm
         });
         viewHolder.getTrash().setOnClickListener(v -> itemListener.onTaskDelete(task));
-
         final CheckBox active = viewHolder.getActive();
         active.setChecked(task.isCompleted());
         balloon.setImageResource(balloonIds[color]);
