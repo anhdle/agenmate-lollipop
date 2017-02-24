@@ -40,7 +40,7 @@ public class AlarmController implements BaseAlarmController {
             PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {        // KITKAT and later
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
                     alarmManager.set(AlarmManager.RTC_WAKEUP, time, sender);
                 } else {
                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, time, sender);
@@ -52,7 +52,6 @@ public class AlarmController implements BaseAlarmController {
                 Settings.System.putString(context.getContentResolver(),
                         Settings.System.NEXT_ALARM_FORMATTED, fmt.format(time));
             } else {
-                Log.v("alarm", "reset");
                 Intent showIntent = new Intent(context, AddEditActivity.class);
                 PendingIntent showOperation = PendingIntent.getActivity(context, 0, showIntent, PendingIntent.FLAG_UPDATE_CURRENT);
                 AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(time, showOperation);
@@ -68,13 +67,11 @@ public class AlarmController implements BaseAlarmController {
 
     @Override
     public void dismissAlarm() {
-        Log.v("alarm", "dismiss");
         context.stopService(new Intent(context, AlarmService.class));
     }
 
     @Override
     public void cancelAlarm() {
-        Log.v("alarm", "cancel");
         Intent intent = new Intent(context, AlarmReceiver.class);
         PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, 0);
         alarmManager.cancel(sender);

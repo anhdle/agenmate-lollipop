@@ -53,7 +53,6 @@ import net.danlew.android.joda.DateUtils;
 
 import org.joda.time.DateTime;
 
-import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
@@ -72,11 +71,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
     private AddEditContract.Presenter presenter;
     private ImageButton [] colorButtons;
-    boolean showFAB = true;
-
     private ArcMenu timeMenu;
-    private static int timeHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-    private static int timeMinute = Calendar.getInstance().get(Calendar.MINUTE);
     private int[] colorTabIds = {R.color.md_red_700, R.color.md_orange_700, R.color.md_yellow_700, R.color.md_green_700, R.color.md_blue_700, R.color.md_indigo_700, R.color.md_deep_purple_700};
     private int[] colorBackgroundIds = {R.color.md_red_50, R.color.md_orange_50, R.color.md_yellow_50, R.color.md_green_50, R.color.md_blue_50, R.color.md_indigo_50, R.color.md_deep_purple_50};
     private int[] colorDrawables = {R.drawable.red_round_button, R.drawable.orange_round_button, R.drawable.yellow_round_button, R.drawable.green_round_button, R.drawable.blue_round_button, R.drawable.indigo_round_button, R.drawable.violet_round_button} ;
@@ -84,6 +79,8 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     private Unbinder unbinder;
     private DateTime setTime;
     private int timeFormat;
+    private int previousState = BottomSheetBehavior.STATE_COLLAPSED;
+    private boolean hasAlarm;
 
     @BindViews({ R.id.title_text_view, R.id.title_card_view, R.id.desc_text_view, R.id.desc_card_view, R.id.priority_text_view, R.id.priority_card_view, R.id.color_text_view}) List<View> bottomViews;
 
@@ -102,43 +99,11 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     @BindView(R.id.priority_text_view) TextView priorityText;
     @BindView(R.id.priority_seek_bar) SnappingSeekBar seekBar;
 
-    private static final ButterKnife.Action<View> ALPHA_APPEAR = (view, index) -> {
-        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
-        alphaAnimation.setDuration(250);
-        alphaAnimation.setStartOffset(index * 250);
-        alphaAnimation.setFillAfter(true);
-        view.startAnimation(alphaAnimation);
-    };
+    public static AddEditFragment newInstance() {
+        return new AddEditFragment();
+    }
 
-    private final ButterKnife.Action<View> ALPHA_FADE = (view, index) -> {
-        AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-        alphaAnimation.setDuration(250);
-        alphaAnimation.setStartOffset(index * 250);
-        alphaAnimation.setFillAfter(true);
-        if(index == 5){
-            alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    if(timePickerLayout.getDueDateStatus() == TimePickerLayout.NO_DUE_DATE){
-                        timePickerLayout.setDueDateStatus(TimePickerLayout.HAS_DUE_DATE);
-                        setDueDateText(dueDateTeller);
-                        ButterKnife.apply(dueDateTeller, ALPHA_APPEAR);
-                    }
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-
-                }
-            });
-        }
-        view.startAnimation(alphaAnimation);
-    };
+    public AddEditFragment() {}
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -147,12 +112,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         setRetainInstance(true);
         colorButtons = new ImageButton[7];
     }
-
-    public static AddEditFragment newInstance() {
-        return new AddEditFragment();
-    }
-
-    public AddEditFragment() {}
 
     @Override
     public void onResume() {
@@ -248,40 +207,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
             }
         });*/
 
-
-      /*
-              Button start_alarm= (Button) root.findViewById(R.id.start_alarm);
-        start_alarm.setOnClickListener(v -> {
-            setAlarmText("Alarm set");
-            int hour;
-            int minute;
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M){
-                hour = alarmTimePicker.getCurrentHour();
-                minute = alarmTimePicker.getCurrentMinute();
-
-            } else {
-                hour = alarmTimePicker.getHour();
-                minute = alarmTimePicker.getMinute();
-            }
-            presenter.getAlarmController().resetAlarm(minute, hour);
-        });
-
-        Button dismiss = (Button)root.findViewById(R.id.dismiss_alarm);
-        dismiss.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setAlarmText("Alarm dismiss");
-                presenter.getAlarmController().dismissAlarm();
-            }
-        });
-
-        Button cancel= (Button) root.findViewById(R.id.cancel_alarm);
-        cancel.setOnClickListener(v -> {
-            setAlarmText("Alarm cancel");
-            presenter.getAlarmController().cancelAlarm();
-        });*/
-
-
         for (int i = 0; i < 7; i++) {
             final int index = i;
             final ImageButton button = new ImageButton(getActivity());
@@ -292,7 +217,7 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
             colorButtons[i] = button;
 
             arcMenu.addItem(button, v -> {
-                v.setAlpha(0.2f);
+                v.setAlpha(0.5f);
                 if(index != selectedColor){
                     colorButtons[selectedColor].setAlpha(1f);
                     setColor(index);
@@ -309,6 +234,44 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
         return rootView;
     }
+
+    private static final ButterKnife.Action<View> ALPHA_APPEAR = (view, index) -> {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(0, 1);
+        alphaAnimation.setDuration(250);
+        alphaAnimation.setStartOffset(index * 250);
+        alphaAnimation.setFillAfter(true);
+        view.startAnimation(alphaAnimation);
+    };
+
+    private final ButterKnife.Action<View> ALPHA_FADE = (view, index) -> {
+        AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
+        alphaAnimation.setDuration(250);
+        alphaAnimation.setStartOffset(index * 250);
+        alphaAnimation.setFillAfter(true);
+        if(index == 5){
+            alphaAnimation.setAnimationListener(new Animation.AnimationListener() {
+                @Override
+                public void onAnimationStart(Animation animation) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    if(timePickerLayout.getDueDateStatus() == TimePickerLayout.NO_DUE_DATE){
+                        timePickerLayout.setDueDateStatus(TimePickerLayout.HAS_DUE_DATE);
+                        setDueDateText(dueDateTeller);
+                        ButterKnife.apply(dueDateTeller, ALPHA_APPEAR);
+                    }
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+
+                }
+            });
+        }
+        view.startAnimation(alphaAnimation);
+    };
 
     @Override
     public void showEmptyTaskError() {
@@ -365,7 +328,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
 
 
         timePickerLayout.setOnTimePickerChangeListener(time -> {
-            // TODO check if time need to mark change later
             setTime = time;
             setDueDateText(dueDateTeller);
         });
@@ -425,9 +387,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
         ((AddEditActivity)getActivity()).setBarColor(selectedColor, selectedColor == 0 || selectedColor == 5 || selectedColor == 6);
     }
 
-    private int previousState = BottomSheetBehavior.STATE_COLLAPSED;
-
-    private boolean hasAlarm;
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

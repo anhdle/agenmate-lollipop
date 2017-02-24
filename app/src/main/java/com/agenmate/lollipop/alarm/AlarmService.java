@@ -1,6 +1,5 @@
 package com.agenmate.lollipop.alarm;
 
-import android.annotation.TargetApi;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -23,15 +21,10 @@ import com.agenmate.lollipop.addedit.AddEditActivity;
 
 public class AlarmService extends Service {
 
-    // Time period between two vibration events
     private final static int VIBRATE_DELAY_TIME = 2000;
-    // Vibrate for 1000 milliseconds
     private final static int DURATION_OF_VIBRATION = 1000;
-    // Increase alarm volume gradually every 600ms
     private final static int VOLUME_INCREASE_DELAY = 600;
-    // Volume level increasing step
     private final static float VOLUME_INCREASE_STEP = 0.01f;
-    // Max player volume level
     private final static float MAX_VOLUME = 1.0f;
 
     private MediaPlayer mediaPlayer;
@@ -70,13 +63,6 @@ public class AlarmService extends Service {
         return true;
     };
 
-
-
-
-
-    private boolean isRunning;
-    private Context context;
-    private int startId;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -117,66 +103,8 @@ public class AlarmService extends Service {
                 .setAutoCancel(true)
                 .build();
 
-        String state = intent.getExtras().getString("extra");
 
-        assert state != null;
-        switch (state) {
-            case "no":
-                startId = 0;
-                break;
-            case "yes":
-                startId = 1;
-                break;
-            default:
-                startId = 0;
-                break;
-        }
-
-        // get richard's thing
-        if(!this.isRunning && startId == 1) {
-            Log.e("if there was not sound ", " and you want start");
-
-            Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-            ringtone = RingtoneManager.getRingtone(getApplicationContext(), uri);
-
-            Log.v("ringtonestart", String.valueOf(ringtone));
-            ringtone.play();
-
-
-            mNM.notify(0, mNotify);
-
-            this.isRunning = true;
-            this.startId = 0;
-
-        }
-        else if (!this.isRunning && startId == 0){
-            Log.e("if there was not sound ", " and you want end");
-
-            this.isRunning = false;
-            this.startId = 0;
-
-        }
-
-        else if (this.isRunning && startId == 1){
-            Log.e("if there is sound ", " and you want start");
-
-            this.isRunning = true;
-            this.startId = 0;
-
-        }
-        else {
-            Log.e("if there is sound ", " and you want end");
-            Log.v("ringtonestop", String.valueOf(ringtone));
-            ringtone.stop();
-
-            this.isRunning = false;
-            this.startId = 0;
-        }
-
-
-        Log.e("MyActivity", "In the service");
         */
-
         return START_STICKY;
     }
 
@@ -191,7 +119,6 @@ public class AlarmService extends Service {
             mediaPlayer = null;
         }
         mHandler.removeCallbacksAndMessages(null);
-        this.isRunning = false;
     }
 
 
@@ -200,15 +127,11 @@ public class AlarmService extends Service {
         mediaPlayer.setOnErrorListener(mErrorListener);
 
         try {
-            // add vibration to alarm alert if it is set
-            if(true) {
-           // if (App.getState().settings().vibrate()) {
+
+            if(true) {  // add vibration to alarm alert if it is set
                 mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
                 mHandler.post(mVibrationRunnable);
             }
-            // Player setup is here
-           // String ringtone = App.getState().settings().ringtone();
-
             String ringtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString();
            /* if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
                  //   && ringtone.startsWith("content://media/external/")
@@ -222,8 +145,7 @@ public class AlarmService extends Service {
             mediaPlayer.prepare();
             mediaPlayer.start();
 
-            if(true){
-          //  if (App.getState().settings().ramping()) {
+            if(true){  //  if ramping is set
                 mHandler.postDelayed(mVolumeRunnable, VOLUME_INCREASE_DELAY);
             } else {
                 mediaPlayer.setVolume(MAX_VOLUME, MAX_VOLUME);

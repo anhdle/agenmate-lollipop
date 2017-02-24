@@ -326,15 +326,8 @@ public class FlippingArc extends View {
         boolean ignore = false;
         float x = xPos - mTranslateX;
         float y = yPos - mTranslateY;
-       // Log.v("xPos", String.valueOf(xPos));
-        //Log.v("yPos", String.valueOf(yPos));
-
-       // Log.v("radius", String.valueOf(mArcRadius));
-
         float touchRadius = (float) Math.sqrt(((x * x) + (y * y)));
         float touchLimit = (float) Math.sqrt(2 * mArcRadius * mArcRadius );
-        //Log.v("touchRadius", String.valueOf(touchRadius));
-        //Log.v("ignoreradius", String.valueOf(mTouchIgnoreRadius));
         if (touchRadius > touchLimit) {
             ignore = true;
         }
@@ -407,7 +400,7 @@ public class FlippingArc extends View {
      * @param l
      *            The seek bar notification listener
      *
-     * @see SeekArc.OnSeekBarChangeListener
+     * @see FlippingArc.OnSeekArcChangeListener
      */
     public void setOnSeekArcChangeListener(FlippingArc.OnSeekArcChangeListener l) {
         mOnSeekArcChangeListener = l;

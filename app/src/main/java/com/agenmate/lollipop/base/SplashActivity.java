@@ -3,7 +3,6 @@ package com.agenmate.lollipop.base;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.ImageView;
@@ -66,7 +65,7 @@ public class SplashActivity extends BaseActivity implements ShakeDetector.Listen
 
     @Override
     public void hearShake() {
-        Log.v("shake", "ah");
+        //Log.v("shake", "ah");
     }
 
     @Override

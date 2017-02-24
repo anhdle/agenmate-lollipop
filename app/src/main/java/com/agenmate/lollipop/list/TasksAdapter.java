@@ -4,8 +4,8 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -101,13 +101,15 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
         }
     }
 
+    private int dateFormat;
     private int timeFormat;
 
     public TasksAdapter(Context context, List<Task> tasks, TaskItemListener itemListener) {
         setList(tasks);
         this.context = context;
         this.itemListener = itemListener;
-        timeFormat = DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR;
+        dateFormat = DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR;
+        timeFormat = DateUtils.FORMAT_SHOW_TIME;
     }
 
     public void replaceData(List<Task> tasks, boolean notify) {
@@ -130,7 +132,6 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
         final Task task = tasks.get(position);
         final int priority = task.getPriority();
-        Log.v("priory", String.valueOf(task.getDescription()));
         formatText(viewHolder.getTitleText(), "<b>" + task.getTitle() + "</b>", Color.BLACK, 0);
         formatText(viewHolder.getDescText(), task.getDescription(), Color.BLACK, 0);
         formatText(viewHolder.getPriorityText(), getPriorityText(priority), Color.WHITE, priority);
@@ -165,11 +166,16 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
 
         final long time = task.getDueAt();
         final TextView date = viewHolder.getDateText();
-        Log.v("getdue", String.valueOf(time));
         if(time != 0){
             DateTime dueTime = new DateTime(time / 1000L);
-            formatText(date, null, Color.BLACK, 0);
-            date.setText(DateUtils.formatDateTime(context, dueTime, timeFormat));
+            if(dueTime.getMillis() >= new DateTime().getMillis()){
+                formatText(date, null, Color.BLACK, 0);
+                date.setText((DateUtils.isToday(dueTime)? "Today, " : "") + DateUtils.formatDateTime(context, dueTime, DateUtils.isToday(dueTime) ? timeFormat : dateFormat));
+            } else {
+                formatText(date, null, ContextCompat.getColor(context, R.color.md_red_700), 0);
+                date.setText("Overdue " + DateUtils.getRelativeTimeSpanString(context, dueTime));
+            }
+
         } else date.setText("");
     }
 

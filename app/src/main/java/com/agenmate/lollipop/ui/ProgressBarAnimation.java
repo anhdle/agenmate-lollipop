@@ -4,10 +4,6 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ProgressBar;
 
-/**
- * User: tobiasbuchholz
- * Date: 28.07.14 | Time: 14:18
- */
 public class ProgressBarAnimation extends Animation {
     private ProgressBar mProgressBar;
     private float       mFrom;

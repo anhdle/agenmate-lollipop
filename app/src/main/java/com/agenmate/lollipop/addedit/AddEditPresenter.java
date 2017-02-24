@@ -18,7 +18,6 @@ package com.agenmate.lollipop.addedit;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.agenmate.lollipop.alarm.BaseAlarmController;
 import com.agenmate.lollipop.data.Task;
@@ -115,7 +114,6 @@ final class AddEditPresenter implements AddEditContract.Presenter {
 
     @Override
     public void saveTask(String title, String description, int priority, int color, long dueAt, boolean hasAlarm) {
-        Log.v("isnewTask", String.valueOf(isNewTask()));
         if (isNewTask()) {
             createTask(title, description, priority, color, dueAt, hasAlarm);
         } else {
