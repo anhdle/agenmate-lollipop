@@ -132,7 +132,9 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
 
     public void initViews() {
         initSeekBar();
-        initIndicators();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            initIndicators();
+        }
     }
 
     private void initSeekBar() {
@@ -149,8 +151,11 @@ public class SnappingSeekBar extends RelativeLayout implements SeekBar.OnSeekBar
         redBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_thumb_red);
         yellowBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_thumb_yellow);
         orangeBalloon = ContextCompat.getDrawable(getContext(), R.drawable.balloon_thumb_orange);
-        ViewUtils.setColor(mProgressDrawable, mProgressColor);
-        ViewUtils.setColor(redBalloon, mThumbnailColor);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            ViewUtils.setColor(mProgressDrawable, mProgressColor);
+            ViewUtils.setColor(redBalloon, mThumbnailColor);
+        }
+
         mSeekBar.setProgressDrawable(mProgressDrawable);
         mSeekBar.setThumb(redBalloon);
         final int thumbnailWidth = redBalloon.getIntrinsicWidth();

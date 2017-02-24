@@ -19,7 +19,6 @@ android {
         vectorDrawables.useSupportLibrary = true
         multiDexEnabled true
 
-
         jackOptions {
             enabled true
         }
@@ -93,6 +92,25 @@ android {
     testOptions.unitTests.all {
         testLogging {
             events 'passed', 'skipped', 'failed', 'standardOut', 'standardError'
+        }
+    }
+
+    dexOptions {
+        preDexLibraries = false
+    }
+
+    afterEvaluate {
+        tasks.matching {
+            it.name.startsWith('dex')
+        }.each { dx ->
+            if (dx.additionalParameters == null) {
+                dx.additionalParameters = ['--multi-dex']
+            } else {
+                dx.additionalParameters += '--multi-dex'
+            }
+
+            // optional
+            dx.additionalParameters += "--main-dex-list=$projectDir/multidex.txt".toString() // enable the main-dex-list
         }
     }
 }

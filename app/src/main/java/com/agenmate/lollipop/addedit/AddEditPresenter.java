@@ -48,7 +48,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 final class AddEditPresenter implements AddEditContract.Presenter {
 
     @NonNull
-    private final TasksDataSource mTasksRepository;
+    private final TasksDataSource tasksRepository;
 
     @NonNull
     private final AddEditContract.View addEditView;
@@ -78,7 +78,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
                      @NonNull BaseSchedulerProvider schedulerProvider,
                      @NonNull BaseAlarmController alarmController) {
         this.taskId = taskId;
-        mTasksRepository = checkNotNull(tasksRepository);
+        this.tasksRepository = checkNotNull(tasksRepository);
         this.addEditView = checkNotNull(addEditView);
         mSchedulerProvider = checkNotNull(schedulerProvider);
         this.alarmController = checkNotNull(alarmController);
@@ -128,7 +128,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
 
-        mSubscriptions.add(mTasksRepository
+        mSubscriptions.add(tasksRepository
                 .getTask(taskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
@@ -165,8 +165,8 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         if (newTask.isEmpty()) {
             addEditView.showEmptyTaskError();
         } else {
-            mTasksRepository.saveTask(newTask);
-            addEditView.showTasksList();
+            tasksRepository.saveTask(newTask);
+            addEditView.showTasksList(color);
         }
     }
 
@@ -174,8 +174,8 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         if (isNewTask()) {
             throw new RuntimeException("updateTask() was called but task is new.");
         }
-        mTasksRepository.saveTask(new Task(title, description, priority, color, dueAt, hasAlarm, taskId));
-        addEditView.showTasksList(); // After an edit, go back to the list.
+        tasksRepository.saveTask(new Task(title, description, priority, color, dueAt, hasAlarm, taskId));
+        addEditView.showTasksList(color);
     }
 
     public BaseAlarmController getAlarmController() {
@@ -188,7 +188,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
             addEditView.showMissingTask();
             return;
         }
-        mTasksRepository.deleteTask(taskId);
+        tasksRepository.deleteTask(taskId);
         addEditView.showTaskDeleted();
     }
 }

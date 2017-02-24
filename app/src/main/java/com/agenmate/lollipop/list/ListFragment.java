@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.addedit.AddEditActivity;
@@ -48,72 +49,23 @@ import jp.wasabeef.recyclerview.animators.LandingAnimator;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Display a grid of {@link Task}s. User can choose to view all, active or completed tasks.
- */
 public class ListFragment extends Fragment implements ListContract.View  {
 
     private static final String TAG = "ListFragment";
-
-    // TODO disbale loading
     protected TasksAdapter tasksAdapter;
     protected LinearLayoutManager layoutManager;
     private ListContract.Presenter presenter;
     private Unbinder unbinder;
-    public ListFragment() {}
-
+    private TextView emptyText;
     private FloatingActionButton fab;
     private SheetLayout sheetLayout;
+    public ListFragment() {}
 
     private int[] colorIds = {R.color.md_red_700, R.color.md_orange_700, R.color.md_yellow_700, R.color.md_green_700, R.color.md_blue_700, R.color.md_indigo_700, R.color.md_deep_purple_700};
-
 
     @BindView(R.id.list_view) RecyclerView recyclerView;
     @BindView(R.id.swipe) ScrollChildSwipeRefreshLayout swipeRefreshLayout;
 
-    TaskItemListener taskItemListener = new TaskItemListener() {
-        @Override
-        public void onTaskClick(Task clickedTask, ImageView view, int color) {
-
-            sheetLayout.setColor(ContextCompat.getColor(getActivity(), colorIds[color]));
-            sheetLayout.setFab(view);
-            sheetLayout.setFabAnimationEndListener(new SheetLayout.OnAnimationListener() {
-                @Override
-                public void onContractAnimationStart() {
-
-                }
-
-                @Override
-                public void onContractAnimationEnd() {
-                    ((ListActivity)getActivity()).setStatusBarColor(0);
-                }
-
-                @Override
-                public void onExpandAnimationEnd() {
-                    presenter.openTaskDetails(clickedTask);
-                }
-
-                @Override
-                public void onExpandAnimationStart() {
-                    ((ListActivity)getActivity()).setStatusBarColor(color);
-                }
-            });
-
-            sheetLayout.expandFab();
-
-        }
-
-        @Override
-        public void onTaskDelete(Task deletedTask) {
-            presenter.deleteTask(deletedTask.getId());
-        }
-
-        @Override
-        public void onCompleteTaskClick(Task completedTask) { presenter.completeTask(completedTask); }
-
-        @Override
-        public void onActivateTaskClick(Task activatedTask) { presenter.activateTask(activatedTask); }
-    };
 
     public static ListFragment newInstance() {
         return new ListFragment();
@@ -126,7 +78,8 @@ public class ListFragment extends Fragment implements ListContract.View  {
         View rootView = inflater.inflate(R.layout.fragment_list, container, false);
         rootView.setTag(TAG);
         unbinder = ButterKnife.bind(this, rootView);
-        swipeRefreshLayout.setEnabled(false); // TODO fix missing tasks on swipe
+        emptyText = ((ListActivity)getActivity()).getEmptyText();
+        swipeRefreshLayout.setEnabled(false); // no need since no remote data yet
         //swipeRefreshLayout.setOnRefreshListener(() -> presenter.loadTasks(false));
         //swipeRefreshLayout.setScrollUpChild(recyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
@@ -176,7 +129,6 @@ public class ListFragment extends Fragment implements ListContract.View  {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
                 if (dy > 0 ||dy < 0 && fab.isShown()) {
                     fab.hide();
                 }
@@ -231,22 +183,22 @@ public class ListFragment extends Fragment implements ListContract.View  {
             return;
         }
 
-        // Make sure setRefreshing() is called after the layout is done with everything else.
-        swipeRefreshLayout.post(new Runnable() {
-            @Override
-            public void run() {
-                swipeRefreshLayout.setRefreshing(active);
-            }
-        });
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(active));
     }
 
     @Override
     public void showTasks(List<Task> tasks, boolean notify) {
+        emptyText.setVisibility(View.GONE);
         tasksAdapter.replaceData(tasks, notify);
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(data != null){
+            int color = data.getIntExtra("color", 0);
+            sheetLayout.setColor(ContextCompat.getColor(getActivity(), colorIds[color]));
+            ((ListActivity)getActivity()).setStatusBarColor(color);
+        }
         presenter.result(requestCode, resultCode);
     }
 
@@ -290,7 +242,8 @@ public class ListFragment extends Fragment implements ListContract.View  {
 
     @Override
     public void showNoTasks() {
-       tasksAdapter.clear();
+        emptyText.setVisibility(View.VISIBLE);
+        tasksAdapter.clear();
     }
 
     @Override
@@ -341,4 +294,49 @@ public class ListFragment extends Fragment implements ListContract.View  {
     private void showMessage(String message){
         Snackbar.make(getView(), message, Snackbar.LENGTH_LONG).show();
     }
+
+    private TaskItemListener taskItemListener = new TaskItemListener() {
+        @Override
+        public void onTaskClick(Task clickedTask, ImageView view, int color) {
+
+            sheetLayout.setColor(ContextCompat.getColor(getActivity(), colorIds[color]));
+            sheetLayout.setFab(view);
+            sheetLayout.setFabAnimationEndListener(new SheetLayout.OnAnimationListener() {
+                @Override
+                public void onContractAnimationStart() {
+
+                }
+
+                @Override
+                public void onContractAnimationEnd() {
+                    ((ListActivity)getActivity()).setStatusBarColor(0);
+                }
+
+                @Override
+                public void onExpandAnimationEnd() {
+                    presenter.openTaskDetails(clickedTask);
+                }
+
+                @Override
+                public void onExpandAnimationStart() {
+                    ((ListActivity)getActivity()).setStatusBarColor(color);
+                }
+            });
+
+            sheetLayout.expandFab();
+
+        }
+
+        @Override
+        public void onTaskDelete(Task deletedTask) {
+            presenter.deleteTask(deletedTask.getId());
+        }
+
+        @Override
+        public void onCompleteTaskClick(Task completedTask) { presenter.completeTask(completedTask); }
+
+        @Override
+        public void onActivateTaskClick(Task activatedTask) { presenter.activateTask(activatedTask); }
+    };
+
 }

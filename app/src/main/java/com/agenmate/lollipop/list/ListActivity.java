@@ -1,19 +1,3 @@
-/*
- * Copyright (C) 2015 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.agenmate.lollipop.list;
 
 
@@ -37,12 +21,14 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.agenmate.lollipop.R;
 import com.agenmate.lollipop.app.AppController;
 import com.agenmate.lollipop.base.BaseActivity;
 import com.agenmate.lollipop.ui.layout.SheetLayout;
 import com.agenmate.lollipop.util.EspressoIdlingResource;
+import com.agenmate.lollipop.util.FontUtils;
 import com.agenmate.lollipop.util.MarkupUtils;
 
 import javax.inject.Inject;
@@ -68,13 +54,13 @@ public class ListActivity extends BaseActivity {
     @BindView(R.id.view_pager) ViewPager viewPager;
     @BindView(R.id.fab) FloatingActionButton fab;
     @BindView(R.id.tabs) TabLayout tabLayout;
+    @BindView(R.id.empty_text) TextView emptyText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-     //   enterFromBottomAnimation();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-        enterFromBottomAnimation();
+        //enterFromBottomAnimation();
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
 
@@ -91,7 +77,7 @@ public class ListActivity extends BaseActivity {
         drawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, toolbar, R.string.drawer_open,  R.string.drawer_close);
         mDrawerLayout.addDrawerListener(drawerToggle);
         drawerToggle.setDrawerArrowDrawable(drawerArrowDrawable);*/
-
+        emptyText.setTypeface(FontUtils.get(this, "Dudu"));
         sheetLayout.setFab(fab);
         tabLayout.setupWithViewPager(viewPager);
         orderedFragment = ListFragment.newInstance();
@@ -177,4 +163,6 @@ public class ListActivity extends BaseActivity {
     }
 
     public SheetLayout getSheetLayout(){return sheetLayout;}
+
+    public TextView getEmptyText(){return emptyText;}
 }

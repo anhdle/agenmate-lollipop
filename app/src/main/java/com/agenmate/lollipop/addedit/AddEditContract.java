@@ -16,7 +16,6 @@
 
 package com.agenmate.lollipop.addedit;
 
-import com.agenmate.lollipop.alarm.AlarmController;
 import com.agenmate.lollipop.alarm.BaseAlarmController;
 import com.agenmate.lollipop.base.BasePresenter;
 import com.agenmate.lollipop.base.BaseView;
@@ -30,7 +29,7 @@ public interface AddEditContract {
 
         void showEmptyTaskError();
 
-        void showTasksList();
+        void showTasksList(int returnColor);
 
         void showMissingTask();
 

@@ -27,7 +27,6 @@ public class SplashActivity extends BaseActivity implements ShakeDetector.Listen
 
     private static final ButterKnife.Action<View> ALPHA_FADE = (view, index) -> {
         AlphaAnimation alphaAnimation = new AlphaAnimation(1, 0);
-        //alphaAnimation.setFillBefore(true);
         alphaAnimation.setDuration(1500);
         alphaAnimation.setStartOffset(index * 300);
         alphaAnimation.setFillAfter(true);

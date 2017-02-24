@@ -17,6 +17,7 @@
 package com.agenmate.lollipop.addedit;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -62,9 +63,6 @@ import butterknife.Unbinder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * Main UI for the add task screen. Users can enter a task title and description.
- */
 public class AddEditFragment extends Fragment implements AddEditContract.View {
 
     public static final String ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID";
@@ -279,8 +277,8 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     }
 
     @Override
-    public void showTasksList() {
-        getActivity().setResult(Activity.RESULT_OK);
+    public void showTasksList(int returnColor) {
+        getActivity().setResult(Activity.RESULT_OK, new Intent().putExtra("color", returnColor));
         getActivity().finish();
     }
 
@@ -302,7 +300,6 @@ public class AddEditFragment extends Fragment implements AddEditContract.View {
     @Override
     public void setPriority(int priority) {
         seekBar.setProgress(priority * 50);
-
     }
 
     @Override

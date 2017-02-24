@@ -152,15 +152,12 @@ public class TasksAdapter extends RecyclerView.Adapter<TasksAdapter.ViewHolder> 
 
         final CheckBox active = viewHolder.getActive();
         active.setChecked(task.isCompleted());
-        balloon.setImageResource(task.isCompleted() ? R.drawable.disable_balloon : balloonIds[color]);
+        balloon.setImageResource(balloonIds[color]);
         active.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 itemListener.onCompleteTaskClick(task);
-                balloon.setImageResource(R.drawable.disable_balloon);
             } else {
                 itemListener.onActivateTaskClick(task);
-                balloon.setImageResource(balloonIds[color]);
-                startAnimation(balloon);
             }
         });
 

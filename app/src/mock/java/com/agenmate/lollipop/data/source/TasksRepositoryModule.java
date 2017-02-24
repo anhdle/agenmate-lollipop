@@ -11,9 +11,6 @@ import javax.inject.Singleton;
 import dagger.Module;
 import dagger.Provides;
 
-/**
- * This is used by Dagger to inject the required arguments into the {@link TasksRepository}.
- */
 @Module
 public class TasksRepositoryModule {
 

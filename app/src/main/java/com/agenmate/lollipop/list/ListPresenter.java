@@ -54,6 +54,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
  **/
 final class ListPresenter implements ListContract.Presenter {
 
+    private int returnColor;
+
     @NonNull
     private final TasksRepository mTasksRepository;
 
@@ -112,6 +114,7 @@ final class ListPresenter implements ListContract.Presenter {
     @Override
     public void result(int requestCode, int resultCode) {
         if(Activity.RESULT_OK == resultCode){
+            this.returnColor = returnColor;
             switch (requestCode){
                 case AddEditActivity.REQUEST_ADD_TASK:
                     if(firstLoad){
@@ -145,7 +148,7 @@ final class ListPresenter implements ListContract.Presenter {
      * @param refreshView
      */
     private void loadTasks(final boolean forceUpdate, final boolean showLoadingUI, boolean refreshView) {
-        if (showLoadingUI) {//TODO turn off indicator loading
+        if (showLoadingUI) {
             listView.setLoadingIndicator(true);
         }
         if (forceUpdate) {
@@ -199,11 +202,9 @@ final class ListPresenter implements ListContract.Presenter {
         if (tasks.isEmpty()) {
             processEmptyTasks();
         } else {
-            // Show the list of tasks
             listView.showTasks(tasks, refreshView);
             refreshView = true;
-            // Set the filter label's text.
-            showFilterLabel();
+            //showFilterLabel();
         }
     }
 
@@ -300,5 +301,6 @@ final class ListPresenter implements ListContract.Presenter {
     public TasksFilterType getFiltering() {
         return currentFiltering;
     }
+
 
 }

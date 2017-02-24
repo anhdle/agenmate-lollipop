@@ -32,6 +32,7 @@ import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.text.TextPaint;
@@ -48,6 +49,7 @@ import android.widget.TextView;
 /**
  * Utility methods for working with Views.
  */
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class ViewUtils {
 
     private ViewUtils() { }

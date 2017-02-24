@@ -1,23 +1,21 @@
 package com.agenmate.lollipop.app;
 
-import android.app.Application;
+import android.support.multidex.MultiDexApplication;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.agenmate.lollipop.alarm.AlarmModule;
 import com.agenmate.lollipop.data.source.DaggerTasksRepositoryComponent;
 import com.agenmate.lollipop.data.source.TasksRepositoryComponent;
-import com.agenmate.lollipop.util.FontUtils;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
-public class AppController extends Application {
+public class AppController extends MultiDexApplication {
 
     private TasksRepositoryComponent component;
 
     static {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
-
 
     @Override
     public void onCreate() {
