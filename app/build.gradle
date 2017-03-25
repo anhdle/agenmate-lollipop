@@ -1,10 +1,5 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-}
-
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -20,7 +15,7 @@ android {
         multiDexEnabled true
 
         jackOptions {
-            enabled true
+            enabled false
         }
     }
 
@@ -30,7 +25,6 @@ android {
             // Minifying the variant used for tests is not supported when using Jack.
             minifyEnabled false
             // Uses new built-in shrinker http://tools.android.com/tech-docs/new-build-system/built-in-shrinker
-            useProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             testProguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguardTest-rules.pro'
         }
@@ -132,21 +126,20 @@ dependencies {
     compile "com.squareup.sqlbrite:sqlbrite:$rootProject.sqlbriteVersion"
     compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
     compile "com.google.guava:guava:$rootProject.guavaVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'net.danlew:android.joda:2.9.5.1'
-
 
     // Dagger dependencies
     compile "com.google.dagger:dagger:$rootProject.daggerVersion"
     annotationProcessor "com.google.dagger:dagger-compiler:$rootProject.daggerVersion"
-    provided 'org.glassfish:javax.annotation:10.0-b28'
+    provided 'javax.annotation:jsr250-api:1.0'
 
     // ButterKnife Dependencies
     compile "com.jakewharton:butterknife:$rootProject.butterknifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterknifeVersion"
     
     // Json Parser
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.google.code.gson:gson:2.7'
 
     // Time
     compile 'net.danlew:android.joda:2.9.5.1'
@@ -164,10 +157,6 @@ dependencies {
     compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
     // Image Loader
     compile 'com.github.bumptech.glide:glide:3.7.0'
-
-
-    // Event Bus
-    compile 'org.greenrobot:eventbus:3.0.0'
 
     // DB
    // compile 'org.greenrobot:greendao:3.2.0'

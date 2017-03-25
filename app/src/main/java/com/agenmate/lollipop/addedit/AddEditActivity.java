@@ -62,7 +62,6 @@ public class AddEditActivity extends BaseActivity {
     @Inject BaseAlarmController alarmController;
     @BindView(R.id.appbar) AppBarLayout appBar;
     @BindView(R.id.toolbar) Toolbar toolbar;
-    private ActionBar actionBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +71,7 @@ public class AddEditActivity extends BaseActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         enterFromBottomAnimation();
-        actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
 
@@ -110,9 +109,9 @@ public class AddEditActivity extends BaseActivity {
     @SuppressLint("NewApi")
     public void setBarColor(int color, boolean isWhiteText){
         appBar.setBackgroundColor(ContextCompat.getColor(this, colorBarIds[color]));
-        String htmlColor = isWhiteText ? "'#ffffff'" : "'#000000'";
         String title = taskId == null ? "New Task" : "Edit Task";
-        actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + htmlColor +">" + title + "</font>"));
+        toolbar.setTitleTextColor(isWhiteText ? Color.WHITE : Color.BLACK);
+        toolbar.setTitle(title);
         final Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
         upArrow.setColorFilter(isWhiteText ? Color.WHITE : Color.BLACK, PorterDuff.Mode.SRC_ATOP);
         getSupportActionBar().setHomeAsUpIndicator(upArrow);

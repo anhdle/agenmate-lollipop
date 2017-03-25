@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".list.ListActivity"
-            android:screenOrientation="portrait">
+           >
         </activity>
         <activity
             android:name=".addedit.AddEditActivity"

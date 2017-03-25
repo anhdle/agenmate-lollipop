@@ -5,8 +5,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:2.3.0'
         classpath 'com.google.guava:guava:20.0'
+        classpath 'me.tatarka:gradle-retrolambda:3.5.0'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -31,7 +32,7 @@ ext {
     buildToolsVersion = '25.0.2'
 
     // App dependencies
-    supportLibraryVersion = '25.1.1'
+    supportLibraryVersion = '25.3.0'
     guavaVersion = '20.0'
     junitVersion = '4.12'
     mockitoVersion = '1.10.19'
@@ -40,10 +41,10 @@ ext {
     runnerVersion = '0.5'
     rulesVersion = '0.5'
     espressoVersion = '2.2.2'
-    rxjavaVersion = '1.2.5'
+    rxjavaVersion = '1.2.6'
     rxandroidVersion = '1.2.1'
     sqlbriteVersion = '0.7.0'
-    daggerVersion = '2.8'
+    daggerVersion = '2.9'
     butterknifeVersion = '8.5.1'
     dexmakerVersion = '1.2'
 }

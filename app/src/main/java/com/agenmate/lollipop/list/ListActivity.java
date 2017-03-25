@@ -1,6 +1,7 @@
 package com.agenmate.lollipop.list;
 
 
+import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -40,12 +41,10 @@ public class ListActivity extends BaseActivity {
 
     private static final String CURRENT_FILTERING_KEY = "CURRENT_FILTERING_KEY";
 
-    public static final String TAG = "MainActivity";
-
     private DrawerArrowDrawable drawerArrowDrawable;
     private ActionBarDrawerToggle drawerToggle;
     private ListFragment orderedFragment;
-    @Inject ListPresenter mListPresenter;
+    @Inject ListPresenter listPresenter;
     @BindView(R.id.appbar) AppBarLayout appBar;
     @BindView(R.id.drawer_layout) DrawerLayout mDrawerLayout;
     @BindView(R.id.toolbar) Toolbar toolbar;
@@ -68,7 +67,7 @@ public class ListActivity extends BaseActivity {
         actionBar.setHomeButtonEnabled(false); // disable the button
         actionBar.setDisplayHomeAsUpEnabled(false); // remove the left caret
         actionBar.setDisplayShowHomeEnabled(false); // remove the icon
-        actionBar.setTitle(MarkupUtils.fromHtml("<font color=" + "'#ffffff'" +">AgenMate</font>"));
+        toolbar.setTitleTextColor(Color.WHITE);
         tabLayout.setVisibility(View.GONE);
 
         // TODO finish drawerlayout menu later for remote and profile
@@ -91,7 +90,7 @@ public class ListActivity extends BaseActivity {
         if (savedInstanceState != null) {
             TasksFilterType currentFiltering =
                     (TasksFilterType) savedInstanceState.getSerializable(CURRENT_FILTERING_KEY);
-            mListPresenter.setFiltering(currentFiltering);
+            listPresenter.setFiltering(currentFiltering);
         }
 
 
@@ -109,7 +108,7 @@ public class ListActivity extends BaseActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(CURRENT_FILTERING_KEY, mListPresenter.getFiltering());
+        outState.putSerializable(CURRENT_FILTERING_KEY, listPresenter.getFiltering());
         super.onSaveInstanceState(outState);
     }
 
