@@ -1,5 +1,7 @@
 package com.agenmate.lollipop.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -13,7 +15,7 @@ import java.util.UUID;
  */
 
 
-public final class Task {
+public final class Task implements Parcelable{
 
     @NonNull
     private final String mId;
@@ -91,6 +93,29 @@ public final class Task {
         isCompleted = completed;
     }
 
+    protected Task(Parcel in) {
+        mId = in.readString();
+        mTitle = in.readString();
+        mDescription = in.readString();
+        priority = in.readInt();
+        color = in.readInt();
+        dueAt = in.readLong();
+        hasAlarm = in.readByte() != 0;
+        isCompleted = in.readByte() != 0;
+    }
+
+    public static final Creator<Task> CREATOR = new Creator<Task>() {
+        @Override
+        public Task createFromParcel(Parcel in) {
+            return new Task(in);
+        }
+
+        @Override
+        public Task[] newArray(int size) {
+            return new Task[size];
+        }
+    };
+
     @NonNull
     public String getId() {
         return mId;
@@ -159,4 +184,21 @@ public final class Task {
     }
 
     public void setCompleted(boolean isCompleted){ this.isCompleted = isCompleted;}
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mId);
+        dest.writeString(mTitle);
+        dest.writeString(mDescription);
+        dest.writeInt(priority);
+        dest.writeInt(color);
+        dest.writeLong(dueAt);
+        dest.writeByte((byte) (hasAlarm ? 1 : 0));
+        dest.writeByte((byte) (isCompleted ? 1 : 0));
+    }
 }

@@ -23,12 +23,14 @@ import com.agenmate.lollipop.alarm.BaseAlarmController;
 import com.agenmate.lollipop.data.Task;
 import com.agenmate.lollipop.data.source.TasksDataSource;
 import com.agenmate.lollipop.data.source.TasksRepository;
-import com.agenmate.lollipop.util.schedulers.BaseSchedulerProvider;
+
+import com.d8xo.filling.schedulers.BaseSchedulerProvider;
 import com.google.common.base.Strings;
 
 import javax.inject.Inject;
 
-import rx.subscriptions.CompositeSubscription;
+
+import io.reactivex.disposables.CompositeDisposable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -62,7 +64,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
     private boolean mIsDataMissing;
 
     @NonNull
-    private CompositeSubscription mSubscriptions;
+    private CompositeDisposable disposables;
 
     private BaseAlarmController alarmController;
 
@@ -83,7 +85,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
         mSchedulerProvider = checkNotNull(schedulerProvider);
         this.alarmController = checkNotNull(alarmController);
         mIsDataMissing = true;
-        mSubscriptions = new CompositeSubscription();
+        disposables = new CompositeDisposable();
     }
 
     /**
@@ -108,7 +110,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
 
     @Override
     public void unsubscribe() {
-        mSubscriptions.clear();
+        disposables.clear();
     }
 
 
@@ -128,7 +130,7 @@ final class AddEditPresenter implements AddEditContract.Presenter {
             throw new RuntimeException("populateTask() was called but task is new.");
         }
 
-        mSubscriptions.add(tasksRepository
+        disposables.add(tasksRepository
                 .getTask(taskId)
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())

@@ -8,7 +8,7 @@ import com.agenmate.lollipop.alarm.AlarmReceiver;
 import com.agenmate.lollipop.alarm.BaseAlarmController;
 import com.agenmate.lollipop.app.AppController;
 import com.agenmate.lollipop.app.AppModule;
-import com.agenmate.lollipop.util.schedulers.BaseSchedulerProvider;
+import com.d8xo.filling.schedulers.BaseSchedulerProvider;
 
 
 import javax.inject.Singleton;

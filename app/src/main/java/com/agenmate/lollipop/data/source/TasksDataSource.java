@@ -22,7 +22,8 @@ import com.agenmate.lollipop.data.Task;
 
 import java.util.List;
 
-import rx.Observable;
+import io.reactivex.Observable;
+
 
 /**
  * Main entry point for accessing tasks data.

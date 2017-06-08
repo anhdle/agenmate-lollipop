@@ -3,8 +3,8 @@ package com.agenmate.lollipop.data.source;
 import android.content.Context;
 import com.agenmate.lollipop.data.FakeTasksRemoteDataSource;
 import com.agenmate.lollipop.data.source.local.TasksLocalDataSource;
-import com.agenmate.lollipop.util.schedulers.BaseSchedulerProvider;
-import com.agenmate.lollipop.util.schedulers.SchedulerProvider;
+import com.d8xo.filling.schedulers.BaseSchedulerProvider;
+import com.d8xo.filling.schedulers.SchedulerProvider;
 
 import javax.inject.Singleton;
 

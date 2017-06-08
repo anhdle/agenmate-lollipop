@@ -24,10 +24,11 @@ import com.agenmate.lollipop.data.source.TasksDataSource;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import rx.Observable;
+import io.reactivex.Observable;
 
 /**
  * Implementation of a remote data source with static access to the data for easy testing.
@@ -42,8 +43,64 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
 
     @Override
     public Observable<List<Task>> getTasks() {
-        Collection<Task> values = TASKS_SERVICE_DATA.values();
-        return Observable.from(values).toList();
+        return null;
+    }
+
+    @Override
+    public Observable<Task> getTask(@NonNull String taskId) {
+        return null;
+    }
+
+    @Override
+    public void saveTask(@NonNull Task task) {
+
+    }
+
+    @Override
+    public void completeTask(@NonNull Task task) {
+
+    }
+
+    @Override
+    public void completeTask(@NonNull String taskId) {
+
+    }
+
+    @Override
+    public void activateTask(@NonNull Task task) {
+
+    }
+
+    @Override
+    public void activateTask(@NonNull String taskId) {
+
+    }
+
+    @Override
+    public void clearCompletedTasks() {
+
+    }
+
+    @Override
+    public void refreshTasks() {
+
+    }
+
+    @Override
+    public void deleteAllTasks() {
+
+    }
+
+    @Override
+    public void deleteTask(@NonNull String taskId) {
+
+    }
+
+    /*@Override
+    public Observable<List<Task>> getTasks() {
+        List<Task> values = new LinkedList<>(TASKS_SERVICE_DATA.values());
+        return Observable
+                .fromIterable(new LinkedList<>(TASKS_SERVICE_DATA.values()));
     }
 
     @Override
@@ -114,5 +171,5 @@ public class FakeTasksRemoteDataSource implements TasksDataSource {
         for (Task task : tasks) {
             TASKS_SERVICE_DATA.put(task.getId(), task);
         }
-    }
+    }*/
 }

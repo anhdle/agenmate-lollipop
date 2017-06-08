@@ -19,11 +19,13 @@ package com.agenmate.lollipop.data.source;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
+import android.util.Log;
 
 import com.agenmate.lollipop.data.Task;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -31,8 +33,9 @@ import java.util.NoSuchElementException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
+
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -98,31 +101,42 @@ public class TasksRepository implements TasksDataSource {
     public Observable<List<Task>> getTasks() {
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
-            return Observable.from(mCachedTasks.values()).toList();
+            return Observable
+                    .fromIterable(mCachedTasks.values())
+                    .toList()
+                    .toObservable();
         } else if (mCachedTasks == null) {
             mCachedTasks = new LinkedHashMap<>();
         }
-
+        Log.v("mcacheisdirty", String.valueOf(mCacheIsDirty));
         if(mCacheIsDirty){
-            return Observable.from(mCachedTasks.values()).toList().doOnCompleted(()-> mCacheIsDirty = false);
+            return Observable
+                    .fromIterable(mCachedTasks.values())
+                    .toList()
+                    .toObservable()
+                    .doOnComplete(() ->mCacheIsDirty = false);
+
         } else {
             Observable<List<Task>> localTasks = getAndCacheLocalTasks();
-
-            return Observable.concat(localTasks, null)
+            return localTasks;
+            /*return Observable
+                    .just(localTasks).
                     .filter(tasks -> !tasks.isEmpty())
-                    .first();
+                    .firstElement().toObservable();*/
         }
     }
 
     private Observable<List<Task>> getAndCacheLocalTasks() {
         return mTasksLocalDataSource.getTasks()
-                .flatMap(new Func1<List<Task>, Observable<List<Task>>>() {
+                .flatMap(new Function<List<Task>, Observable<List<Task>>>() {
                     @Override
-                    public Observable<List<Task>> call(List<Task> tasks) {
-                        return Observable.from(tasks)
-                                .doOnNext(task -> mCachedTasks.put(task.getId(), task))
-                                .toList();
+                    public Observable<List<Task>> apply(@io.reactivex.annotations.NonNull List<Task> tasks) throws Exception {
+                        return Observable.fromIterable(tasks)
+                                .doOnNext(task -> mCachedTasks.put(task.getId(), task)).toList().toObservable();
+
                     }
+
+
                 });
     }
 
@@ -233,7 +247,7 @@ public class TasksRepository implements TasksDataSource {
         Observable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
 
 
-        return Observable.concat(localTask, null).first()
+        return Observable.concat(localTask, null).firstElement().toObservable()
                 .map(task -> {
                     if (task == null) {
                         throw new NoSuchElementException("No task found with taskId " + taskId);
@@ -281,6 +295,6 @@ public class TasksRepository implements TasksDataSource {
         return mTasksLocalDataSource
                 .getTask(taskId)
                 .doOnNext(task -> mCachedTasks.put(taskId, task))
-                .first();
+                .firstElement().toObservable();
     }
 }

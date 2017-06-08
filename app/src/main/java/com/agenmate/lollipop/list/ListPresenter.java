@@ -20,22 +20,24 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.agenmate.lollipop.addedit.AddEditActivity;
 import com.agenmate.lollipop.data.Task;
 import com.agenmate.lollipop.data.source.TasksRepository;
 import com.agenmate.lollipop.util.EspressoIdlingResource;
-import com.agenmate.lollipop.util.schedulers.BaseSchedulerProvider;
+import com.d8xo.filling.schedulers.BaseSchedulerProvider;
 import com.google.common.base.Strings;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.Subscription;
-import rx.functions.Func1;
-import rx.subscriptions.CompositeSubscription;
+import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -69,7 +71,7 @@ final class ListPresenter implements ListContract.Presenter {
     private TasksFilterType currentFiltering = TasksFilterType.ALL_TASKS;
 
     @NonNull
-    private CompositeSubscription subscriptions;
+    private CompositeDisposable subscriptions;
 
     @Inject
     Context context;
@@ -88,7 +90,7 @@ final class ListPresenter implements ListContract.Presenter {
         mTasksRepository = checkNotNull(tasksRepository, "tasksRepository cannot be null");
         listView = checkNotNull(tasksView, "tasksView cannot be null!");
         mSchedulerProvider = checkNotNull(schedulerProvider, "schedulerProvider cannot be null");
-        subscriptions = new CompositeSubscription();
+        subscriptions = new CompositeDisposable();
     }
 
     /**
@@ -137,7 +139,7 @@ final class ListPresenter implements ListContract.Presenter {
         firstLoad = sharedPreferences
                 .getBoolean("firstLoad", true);
 
-        loadTasks(forceUpdate || firstLoad, true, true);
+        loadTasks(false, true, true);
     }
 
 
@@ -159,15 +161,19 @@ final class ListPresenter implements ListContract.Presenter {
 
         EspressoIdlingResource.increment(); // App is busy until further notice
         subscriptions.clear();
-        Subscription subscription = mTasksRepository
+        Disposable subscription = mTasksRepository
                 .getTasks()
-                .flatMap(new Func1<List<Task>, Observable<Task>>() {
+                .flatMap(new Function<List<Task>, Observable<Task>>() {
                     @Override
-                    public Observable<Task> call(List<Task> tasks) {
-                        return Observable.from(tasks);
+                    public Observable<Task> apply(@io.reactivex.annotations.NonNull List<Task> tasks) throws Exception {
+                        Log.v("tasksize", String.valueOf(tasks.size()));
+                        Log.v("task1", String.valueOf(tasks.get(0).getTitle()));
+                        return Observable.fromIterable(tasks);
                     }
+
                 })
-                .filter(task -> {
+                /*.filter(task -> {
+
                     switch (currentFiltering) {
                         case ACTIVE_TASKS:
                             return task.isActive();
@@ -177,28 +183,39 @@ final class ListPresenter implements ListContract.Presenter {
                         default:
                             return true;
                     }
-                })
-                .toSortedList((task1, task2) -> {
+                })*/
+                /*.toSortedList((task1, task2) -> {
                     Integer priorityValue = Integer.valueOf(task2.getPriority()).compareTo(task1.getPriority());
                     if (priorityValue == 0) {
                         int dueAtValue = Long.valueOf(task1.getDueAt()).compareTo(task2.getDueAt());
                         return dueAtValue;
                     }
+                    Log.v("priority", String.valueOf(priorityValue));
                     return priorityValue;
-                })
+
+                })*/
+                .toList()
+                .toObservable()
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .doOnTerminate(() -> {
+
+                /*.doAfterTerminate(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
-                }).subscribe(this::processTasks,
+                })*/
+                .subscribe(this::processTasks, throwable -> {
+                    Log.v("throw", throwable.toString());
+                        listView.showLoadingTasksError();
+                });
+                        /*subscribe(this::processTasks,
                         throwable -> listView.showLoadingTasksError(),
-                        () -> listView.setLoadingIndicator(false));
+                        () -> listView.setLoadingIndicator(false));*/
         subscriptions.add(subscription);
     }
 
     private void processTasks(List<Task> tasks) {
+        Log.v("taskempty?", String.valueOf(tasks.isEmpty()));
         if (tasks.isEmpty()) {
             processEmptyTasks();
         } else {

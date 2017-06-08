@@ -27,17 +27,17 @@ import android.util.Log;
 import com.agenmate.lollipop.data.Task;
 import com.agenmate.lollipop.data.source.TasksDataSource;
 import com.agenmate.lollipop.data.source.local.TasksPersistenceContract.TaskEntry;
-import com.agenmate.lollipop.util.schedulers.BaseSchedulerProvider;
-import com.squareup.sqlbrite.BriteDatabase;
-import com.squareup.sqlbrite.SqlBrite;
+import com.d8xo.filling.schedulers.BaseSchedulerProvider;
+import com.d8xo.filling.sqlbrite2.BriteDatabase;
+import com.d8xo.filling.sqlbrite2.SqlBrite;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Singleton;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Observable;
+import io.reactivex.functions.Function;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -54,13 +54,13 @@ public class TasksLocalDataSource implements TasksDataSource {
     private final BriteDatabase mDatabaseHelper;
 
     @NonNull
-    private Func1<Cursor, Task> mTaskMapperFunction;
+    private Function<Cursor, Task> mTaskMapperFunction;
 
     public TasksLocalDataSource(@NonNull Context context, @NonNull BaseSchedulerProvider schedulerProvider) {
         checkNotNull(context);
         checkNotNull(schedulerProvider);
         mDbHelper = new TasksDbHelper(context);
-        SqlBrite sqlBrite = SqlBrite.create();
+        SqlBrite sqlBrite = new SqlBrite.Builder().build();
         mDatabaseHelper = sqlBrite.wrapDatabaseHelper(mDbHelper, schedulerProvider.io());
         mTaskMapperFunction = this::getTask;
     }

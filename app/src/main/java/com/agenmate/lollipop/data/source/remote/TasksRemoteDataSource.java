@@ -30,7 +30,8 @@ import java.util.Map;
 
 import javax.inject.Singleton;
 
-import rx.Observable;
+import io.reactivex.Observable;
+
 
 /**
  * Implementation of the data source that adds a latency simulating network.
