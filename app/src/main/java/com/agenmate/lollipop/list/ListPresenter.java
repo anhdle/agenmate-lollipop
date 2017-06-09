@@ -36,6 +36,7 @@ import javax.inject.Inject;
 import io.reactivex.Observable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 
@@ -150,6 +151,7 @@ final class ListPresenter implements ListContract.Presenter {
      * @param refreshView
      */
     private void loadTasks(final boolean forceUpdate, final boolean showLoadingUI, boolean refreshView) {
+
         if (showLoadingUI) {
             listView.setLoadingIndicator(true);
         }
@@ -198,16 +200,23 @@ final class ListPresenter implements ListContract.Presenter {
                 .toObservable()
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
+                .doOnNext(new Consumer<List<Task>>() {
+                    @Override
+                    public void accept(@io.reactivex.annotations.NonNull List<Task> tasks)  {
+                        Log.v("process", String.valueOf(tasks));
+                        processTasks(tasks);
+                    }
+                })
+                .doOnError(throwable -> listView.showLoadingTasksError())
+                .doOnComplete(() -> listView.setLoadingIndicator(false))
+                .subscribe();
 
                 /*.doAfterTerminate(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
                         EspressoIdlingResource.decrement(); // Set app as idle.
                     }
                 })*/
-                .subscribe(this::processTasks, throwable -> {
-                    Log.v("throw", throwable.toString());
-                        listView.showLoadingTasksError();
-                });
+
                         /*subscribe(this::processTasks,
                         throwable -> listView.showLoadingTasksError(),
                         () -> listView.setLoadingIndicator(false));*/

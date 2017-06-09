@@ -101,11 +101,13 @@ public class TasksRepository implements TasksDataSource {
     public Observable<List<Task>> getTasks() {
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
+            Log.v("cachefirst"," a");
             return Observable
                     .fromIterable(mCachedTasks.values())
                     .toList()
                     .toObservable();
         } else if (mCachedTasks == null) {
+            Log.v("mcachetasknull", "true");
             mCachedTasks = new LinkedHashMap<>();
         }
         Log.v("mcacheisdirty", String.valueOf(mCacheIsDirty));
@@ -118,7 +120,7 @@ public class TasksRepository implements TasksDataSource {
 
         } else {
             Observable<List<Task>> localTasks = getAndCacheLocalTasks();
-            return localTasks;
+            return localTasks.firstElement().toObservable();
             /*return Observable
                     .just(localTasks).
                     .filter(tasks -> !tasks.isEmpty())
