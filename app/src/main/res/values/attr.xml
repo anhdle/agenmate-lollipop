@@ -1,22 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="SheetLayout">
-        <attr name="sheet_color" format="color"/>
-        <attr name="sheet_container_gravity" format="enum">
-            <enum name="start" value="0"/>
-            <enum name="center" value="1"/>
-            <enum name="end" value="2"/>
-        </attr>
-        <attr name="sheet_fab_type" format="enum">
-            <enum name="mini" value="40"/>
-            <enum name="normal" value="56"/>
-        </attr>
-        <attr name="sheet_mode" format="enum">
-            <enum name="full" value="0"/>
-            <enum name="bottom" value="1"/>
-            <enum name="center" value="2"/>
-        </attr>
-    </declare-styleable>
 
     <declare-styleable name="SeekArc">
         <attr name="thumb" format="reference" />

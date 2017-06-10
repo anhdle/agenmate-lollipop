@@ -1,6 +1,5 @@
 package com.agenmate.lollipop.list;
 
-
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
@@ -30,7 +29,6 @@ import com.agenmate.lollipop.base.BaseActivity;
 import com.agenmate.lollipop.ui.layout.SheetLayout;
 import com.agenmate.lollipop.util.EspressoIdlingResource;
 import com.agenmate.lollipop.util.FontUtils;
-import com.agenmate.lollipop.util.MarkupUtils;
 
 import javax.inject.Inject;
 

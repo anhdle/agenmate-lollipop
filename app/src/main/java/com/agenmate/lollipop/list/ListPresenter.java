@@ -168,14 +168,11 @@ final class ListPresenter implements ListContract.Presenter {
                 .flatMap(new Function<List<Task>, Observable<Task>>() {
                     @Override
                     public Observable<Task> apply(@io.reactivex.annotations.NonNull List<Task> tasks) throws Exception {
-                        Log.v("tasksize", String.valueOf(tasks.size()));
-                        Log.v("task1", String.valueOf(tasks.get(0).getTitle()));
                         return Observable.fromIterable(tasks);
                     }
 
                 })
-                /*.filter(task -> {
-
+                .filter(task -> {
                     switch (currentFiltering) {
                         case ACTIVE_TASKS:
                             return task.isActive();
@@ -185,31 +182,21 @@ final class ListPresenter implements ListContract.Presenter {
                         default:
                             return true;
                     }
-                })*/
-                /*.toSortedList((task1, task2) -> {
+                })
+                .toSortedList((task1, task2) -> {
                     Integer priorityValue = Integer.valueOf(task2.getPriority()).compareTo(task1.getPriority());
                     if (priorityValue == 0) {
-                        int dueAtValue = Long.valueOf(task1.getDueAt()).compareTo(task2.getDueAt());
-                        return dueAtValue;
+                        return Long.valueOf(task1.getDueAt()).compareTo(task2.getDueAt());
                     }
-                    Log.v("priority", String.valueOf(priorityValue));
                     return priorityValue;
 
-                })*/
-                .toList()
+                })
                 .toObservable()
                 .subscribeOn(mSchedulerProvider.computation())
                 .observeOn(mSchedulerProvider.ui())
-                .doOnNext(new Consumer<List<Task>>() {
-                    @Override
-                    public void accept(@io.reactivex.annotations.NonNull List<Task> tasks)  {
-                        Log.v("process", String.valueOf(tasks));
-                        processTasks(tasks);
-                    }
-                })
-                .doOnError(throwable -> listView.showLoadingTasksError())
-                .doOnComplete(() -> listView.setLoadingIndicator(false))
-                .subscribe();
+                .subscribe(this::processTasks,
+                        throwable -> listView.showLoadingTasksError(),
+                        () -> listView.setLoadingIndicator(false));
 
                 /*.doAfterTerminate(() -> {
                     if (!EspressoIdlingResource.getIdlingResource().isIdleNow()) {
@@ -217,14 +204,10 @@ final class ListPresenter implements ListContract.Presenter {
                     }
                 })*/
 
-                        /*subscribe(this::processTasks,
-                        throwable -> listView.showLoadingTasksError(),
-                        () -> listView.setLoadingIndicator(false));*/
         subscriptions.add(subscription);
     }
 
     private void processTasks(List<Task> tasks) {
-        Log.v("taskempty?", String.valueOf(tasks.isEmpty()));
         if (tasks.isEmpty()) {
             processEmptyTasks();
         } else {

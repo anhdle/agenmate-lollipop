@@ -101,30 +101,25 @@ public class TasksRepository implements TasksDataSource {
     public Observable<List<Task>> getTasks() {
         // Respond immediately with cache if available and not dirty
         if (mCachedTasks != null && !mCacheIsDirty) {
-            Log.v("cachefirst"," a");
             return Observable
                     .fromIterable(mCachedTasks.values())
                     .toList()
                     .toObservable();
         } else if (mCachedTasks == null) {
-            Log.v("mcachetasknull", "true");
             mCachedTasks = new LinkedHashMap<>();
         }
-        Log.v("mcacheisdirty", String.valueOf(mCacheIsDirty));
         if(mCacheIsDirty){
             return Observable
                     .fromIterable(mCachedTasks.values())
                     .toList()
                     .toObservable()
-                    .doOnComplete(() ->mCacheIsDirty = false);
+                    .doOnComplete(() -> mCacheIsDirty = false);
 
         } else {
-            Observable<List<Task>> localTasks = getAndCacheLocalTasks();
-            return localTasks.firstElement().toObservable();
-            /*return Observable
-                    .just(localTasks).
+            return getAndCacheLocalTasks()
                     .filter(tasks -> !tasks.isEmpty())
-                    .firstElement().toObservable();*/
+                    .firstElement()
+                    .toObservable();
         }
     }
 
@@ -246,10 +241,11 @@ public class TasksRepository implements TasksDataSource {
         }
 
         // Is the task in the local data source? If not, query the network.
-        Observable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
+        //Observable<Task> localTask = getTaskWithIdFromLocalRepository(taskId);
 
 
-        return Observable.concat(localTask, null).firstElement().toObservable()
+        //return Observable.concat(localTask, null).firstElement().toObservable()
+        return getTaskWithIdFromLocalRepository(taskId).firstElement().toObservable()
                 .map(task -> {
                     if (task == null) {
                         throw new NoSuchElementException("No task found with taskId " + taskId);

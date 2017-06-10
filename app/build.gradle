@@ -113,20 +113,7 @@ dependencies {
 
     compile 'com.android.support:multidex:1.0.1'
 
-    // App dependencies
-    compile "com.android.support:palette-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:customtabs:$rootProject.supportLibraryVersion"
-    compile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:cardview-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:design:$rootProject.supportLibraryVersion"
-    compile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
-    compile "com.android.support:support-v4:$rootProject.supportLibraryVersion"
-    compile "io.reactivex.rxjava2:rxandroid:$rootProject.rxandroidVersion"
-    compile "io.reactivex.rxjava2:rxjava:$rootProject.rxjavaVersion"
     compile "com.android.support.test.espresso:espresso-idling-resource:$rootProject.espressoVersion"
-    compile "com.google.guava:guava:$rootProject.guavaVersion"
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'net.danlew:android.joda:2.9.5.1'
 
     // Dagger dependencies
     compile "com.google.dagger:dagger:$rootProject.daggerVersion"
@@ -136,40 +123,16 @@ dependencies {
     // ButterKnife Dependencies
     compile "com.jakewharton:butterknife:$rootProject.butterknifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$rootProject.butterknifeVersion"
-    
-    // Json Parser
-    compile 'com.google.code.gson:gson:2.7'
-
-    // Time
-    compile 'net.danlew:android.joda:2.9.5.1'
-
-    // Collection Support
-    compile 'commons-net:commons-net:3.5'
-    compile 'org.apache.commons:commons-collections4:4.1'
-
-    // API
-    compile 'com.squareup.retrofit2:retrofit:2.1.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
-    compile 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
-
-    // HTTP lodging
-    compile 'com.squareup.okhttp3:logging-interceptor:3.5.0'
-    // Image Loader
-    compile 'com.github.bumptech.glide:glide:3.7.0'
-
     // DB
    // compile 'org.greenrobot:greendao:3.2.0'
     // This is only needed if you want to use encrypted databases
     //compile 'net.zetetic:android-database-sqlcipher:3.5.4'
 
-    // Rx
-    //compile 'com.jakewharton.rxbinding:rxbinding:1.0.0'
 
     // Shake Detector
     compile 'com.squareup:seismic:1.0.2'
 
     compile 'jp.wasabeef:recyclerview-animators:2.2.5'
-
 
     // Dependencies for local unit tests
     testCompile "junit:junit:$rootProject.ext.junitVersion"
@@ -197,7 +160,6 @@ dependencies {
     androidTestCompile "com.android.support:recyclerview-v7:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:appcompat-v7:$rootProject.supportLibraryVersion"
     androidTestCompile "com.android.support:design:$rootProject.supportLibraryVersion"
-
 
     compile project(path: ':lib')
 }

@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.d8xo.filling.schedulers.BaseSchedulerProvider;
+import com.d8xo.filling.schedulers.SchedulerProvider;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -35,5 +38,12 @@ public final class AppModule {
     SharedPreferences provideSharedPreferences() {
         return sharedPreferences;
     }
+
+    @Singleton
+    @Provides
+    BaseSchedulerProvider provideSchedulerProvider() {
+        return new SchedulerProvider();
+    }
+
 
 }
